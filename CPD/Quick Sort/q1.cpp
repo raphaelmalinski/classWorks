@@ -27,10 +27,11 @@ int partition(int C[], int left, int right)
 	chave = C[right];
 	i = left;
 	int loopcount = 0;
-	for (int j = left;j < right; j++)
+	for (int j = left; j < right; j++)
 	{
 		//cout << "\nloop = " << loopcount++ << "i - " << i << " j = " << j << endl;
-		if(C[j] < chave){
+		if (C[j] < chave)
+		{
 			std::swap(C[i], C[j]);
 			i++;
 		}
@@ -39,12 +40,32 @@ int partition(int C[], int left, int right)
 	return i;
 }
 
+int partition_lomuto(int C[], int left, int right)
+{
+	int chave, i;
+	chave = C[left];
+	i = left+1;
+	int loopcount = 0;
+	for (int j = left+1; j <= right; j++)
+	{
+		//cout << "\nloop = " << loopcount++ << "i - " << i << " j = " << j << endl;
+		if (C[j] < chave)
+		{
+			std::swap(C[i], C[j]);
+			i++;
+		}
+	}
+	std::swap(C[left], C[i-1]);
+	return i-1;
+}
+
 void quick_sort_rec(int C[], int left, int right)
 {
 	int pivot; // índice do pivô
 	if (right > left)
 	{
-		pivot = partition(C, left, right);
+		//pivot = partition(C, left, right);
+		pivot = partition_lomuto(C, left, right);
 		quick_sort_rec(C, left, pivot - 1);
 		quick_sort_rec(C, pivot + 1, right);
 	}
