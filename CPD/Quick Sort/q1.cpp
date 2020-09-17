@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <math.h>
 
 using namespace std;
 
@@ -59,13 +60,59 @@ int partition_lomuto(int C[], int left, int right)
 	return i-1;
 }
 
+int partition_hoare(int C[], int left, int right)
+{
+	int chave, i, j;
+	chave = C[left];
+	i = left-1;
+	j = right;
+	int loopcount = 0;
+	while(true){
+		while (C[j] >  chave){
+			j--;
+		} 
+		do{
+			i++;
+		} while (C[i] < chave);
+		if (i >= j)
+		{
+			return j;
+		}
+		std::swap(C[i], C[j]);		
+	}
+}
+
+int partition_hoare_median(int C[], int left, int right)
+{
+	int chave, i, j;
+	chave = C[(left+right)/2];
+	i = left-1;
+	j = right +1;
+	int loopcount = 0;
+	while(true){
+		do{
+			j--;
+		} while (C[j] >  chave);
+		do{
+			i++;
+		} while (C[i] < chave);
+		if (i >= j)
+		{
+			return j;
+		}
+		std::swap(C[i], C[j]);		
+	}
+}
+
 void quick_sort_rec(int C[], int left, int right)
 {
 	int pivot; // índice do pivô
 	if (right > left)
 	{
-		//pivot = partition(C, left, right);
-		pivot = partition_lomuto(C, left, right);
+		pivot = partition(C, left, right);
+		//pivot = partition_lomuto(C, left, right);
+		//pivot = partition_hoare(C, left, right);
+		//pivot = partition_hoare_median(C, left, right);
 		quick_sort_rec(C, left, pivot - 1);
 		quick_sort_rec(C, pivot + 1, right);
 	}
