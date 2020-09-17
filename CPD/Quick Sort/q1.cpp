@@ -106,8 +106,8 @@ void quick_sort_rec_lomuto(int C[], int left, int right)
 	if (right > left)
 	{
 		//Para testar o random, basta comentar o partition_lomuto e descomentar o partition_lomuto_random
-		//pivot = partition_lomuto(C, left, right);
-		pivot = partition_lomuto_random(C, left, right);
+		pivot = partition_lomuto(C, left, right);
+		//pivot = partition_lomuto_random(C, left, right);
 		quick_sort_rec_lomuto(C, left, pivot - 1);
 		quick_sort_rec_lomuto(C, pivot + 1, right);
 	}
@@ -119,8 +119,8 @@ void quick_sort_rec_hoare(int C[], int left, int right)
 	if (right > left)
 	{
 		//Para testar o median, basta comentar o partition_hoare e descomentar o partition_hoare_median
-		//pivot = partition_hoare(C, left, right);
-		pivot = partition_hoare_median(C, left, right);
+		pivot = partition_hoare(C, left, right);
+		//pivot = partition_hoare_median(C, left, right);
 		quick_sort_rec_lomuto(C, left, pivot);
 		quick_sort_rec_lomuto(C, pivot + 1, right);
 	}
@@ -171,48 +171,42 @@ int main(int argc, const char *argv[])
 	int arr1[10] = {12, 2, 5, 4, 8, 7, 6, 9, 1, 15};
 	int arr2[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 	int arr3[10] = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
-	int arr4[SIZE];
-	int arr5[SIZE];
-	int arr6[SIZE];
-	string chaves[1000];
-	string cadeados[1000];
-
-	ifstream arquivo_chaves;
-	ifstream arquivo_cadeados;
-
-	arquivo_chaves.open("chaves.txt");
+	int *entrada;
+	int *arr;
+	entrada = new int[10000000];
+	ifstream arquivo_entrada;
+	arquivo_entrada.open("entradas/entrada-gigante.txt");
+	
 	int i = 0;
-	while (arquivo_chaves >> chaves[i++])
-		;
-	printf("\nRead %d chaves", i - 1);
-	cout << chaves[0];
+	while (arquivo_entrada >> entrada[i++]);
+	int tam, j;
+	int k = 1;
+	for(i = 1; i <= entrada[0]; i++){
+		tam = entrada[k];
+		k++;
+		j = 0;
+		arr = new int[tam];
+		while(j < tam){
+			arr[j] = entrada[k];
+			j++;
+			k++;
+		}
+		//quick_sort_lomuto(arr, tam, 1); 
+		quick_sort_hoare(arr, tam, 1);
+	}
 
-	arquivo_cadeados.open("cadeados.txt");
-	int j = 0;
-	while (arquivo_cadeados >> cadeados[j++])
-		;
-	printf("\nRead %d cadeados", j - 1);
+	// arquivo_cadeados.open("cadeados.txt");
+	// int j = 0;
+	// while (arquivo_cadeados >> cadeados[j++])
+	// 	;
 
-	quick_sort_lomuto(arr1, 10, 1);
-	quick_sort_lomuto(arr2, 10, 1);
-	quick_sort_lomuto(arr3, 10, 1);
+	// quick_sort_lomuto(arr1, 10, 1);
+	// quick_sort_lomuto(arr2, 10, 1);
+	// quick_sort_lomuto(arr3, 10, 1);
 
-	quick_sort_hoare(arr1, 10, 1);
-	quick_sort_hoare(arr2, 10, 1);
-	quick_sort_hoare(arr3, 10, 1);
+	// quick_sort_hoare(arr1, 10, 1);
+	// quick_sort_hoare(arr2, 10, 1);
+	// quick_sort_hoare(arr3, 10, 1);
 
-	// printf("\nWorst case");
-	// for (int i = 0; i < SIZE; i++)
-	// 	arr4[i] = SIZE - i;
-	// quick_sort(arr4, SIZE, 0);
-
-	// for (int j = 0; j < 10; j++)
-	// {
-	// 	for (int i = 0; i < SIZE; i++)
-	// 		arr4[i] = rand() % SIZE + 1;
-	// 	quick_sort(arr4, SIZE, 1);
-	// 	cout << endl
-	// 		 << endl;
-	// }
 	return 0;
 }
