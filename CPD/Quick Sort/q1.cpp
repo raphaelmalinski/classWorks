@@ -168,45 +168,49 @@ void quick_sort_hoare(int C[], int tam, int print_ok)
 
 int main(int argc, const char *argv[])
 {
-	int arr1[10] = {12, 2, 5, 4, 8, 7, 6, 9, 1, 15};
-	int arr2[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-	int arr3[10] = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
-	int *entrada;
-	int *arr;
-	entrada = new int[10000000];
-	ifstream arquivo_entrada;
-	arquivo_entrada.open("entradas/entrada-gigante.txt");
-	
-	int i = 0;
-	while (arquivo_entrada >> entrada[i++]);
+	int *entrada, *arr;
 	int tam, j;
-	int k = 1;
-	for(i = 1; i <= entrada[0]; i++){
+	int k = 1;	int i, l = 0;
+	ifstream arquivo_entrada;
+	ofstream arquivo_saida;
+
+	entrada = new int[10000000];
+	arquivo_entrada.open("entradas/entrada-mini.txt");
+	arquivo_saida.open("saidas/saida.txt", ios::out);
+	while (arquivo_entrada >> entrada[i++])
+		;
+
+	arquivo_saida << entrada[0];
+	arquivo_saida << "\n";
+	for (i = 1; i <= entrada[0]; i++)
+	{
 		tam = entrada[k];
+		arquivo_saida << entrada[k];
+		arquivo_saida << ' ';
 		k++;
 		j = 0;
 		arr = new int[tam];
-		while(j < tam){
+		while (j < tam)
+		{
 			arr[j] = entrada[k];
 			j++;
 			k++;
 		}
-		//quick_sort_lomuto(arr, tam, 1); 
+		//quick_sort_lomuto(arr, tam, 1);
 		quick_sort_hoare(arr, tam, 1);
+		while (l < tam)
+		{
+			arquivo_saida << arr[l];
+			arquivo_saida << ' ';
+			l++;
+		}
+		l = 0;
+		arquivo_saida << "\n";
 	}
 
 	// arquivo_cadeados.open("cadeados.txt");
 	// int j = 0;
 	// while (arquivo_cadeados >> cadeados[j++])
 	// 	;
-
-	// quick_sort_lomuto(arr1, 10, 1);
-	// quick_sort_lomuto(arr2, 10, 1);
-	// quick_sort_lomuto(arr3, 10, 1);
-
-	// quick_sort_hoare(arr1, 10, 1);
-	// quick_sort_hoare(arr2, 10, 1);
-	// quick_sort_hoare(arr3, 10, 1);
-
 	return 0;
 }
