@@ -9,6 +9,7 @@
 using namespace std;
 
 clock_t start_clock, end_clock;
+double lomuto_random_statistics[3] = {0.0, 0.0, 0.0};
 
 void print_array(int C[], int tam)
 {
@@ -88,6 +89,7 @@ int partition_hoare_median(int C[], int left, int right)
 			return j;
 		}
 		std::swap(C[i], C[j]);
+		lomuto_random_statistics[0]++;
 	}
 }
 
@@ -97,6 +99,7 @@ int partition_lomuto_random(int C[], int left, int right)
 	r = rand();
 	pivot = left + r % (right - left + 1);
 	std::swap(C[left], C[pivot]);
+	lomuto_random_statistics[0]++;
 	return partition_lomuto(C, left, right);
 }
 
@@ -105,6 +108,7 @@ void quick_sort_rec_lomuto(int C[], int left, int right)
 	int pivot; // índice do pivô
 	if (right > left)
 	{
+		lomuto_random_statistics[1] = lomuto_random_statistics[1] + 2;
 		//Para testar o random, basta comentar o partition_lomuto e descomentar o partition_lomuto_random
 		//pivot = partition_lomuto(C, left, right);
 		pivot = partition_lomuto_random(C, left, right);
@@ -141,8 +145,9 @@ void quick_sort_lomuto(int C[], int tam, int print_ok)
 		printf("\nArray after:");
 		print_array(C, tam);
 	}
+	lomuto_random_statistics[2] = (end_clock - start_clock) / (double)CLOCKS_PER_SEC;
 	printf("\nQuick Sort time = %f seconds",
-		   (end_clock - start_clock) / (double)CLOCKS_PER_SEC);
+		   lomuto_random_statistics[2]);
 }
 
 void quick_sort_hoare(int C[], int tam, int print_ok)
@@ -199,6 +204,15 @@ void write_lomuto_output(int *entrada, int tam)
 	}
 }
 
+void write_statistics_lomuto()
+{
+	ofstream random_statistics_file;
+	random_statistics_file.open("estatisticas/stats-random.txt", ios::out);
+	random_statistics_file << "Número de swaps: " << (int)lomuto_random_statistics[0] << "\n";
+	random_statistics_file << "Número de chamadas recursivas: " << (int)lomuto_random_statistics[1] << "\n";
+	random_statistics_file << "Tempo de execução: " << lomuto_random_statistics[2] << "\n";
+}
+
 #define SIZE 100
 
 int main(int argc, const char *argv[])
@@ -208,15 +222,14 @@ int main(int argc, const char *argv[])
 	int k = 1;
 	int i, l = 0;
 	ifstream arquivo_entrada;
-	//ofstream arquivo_saida;
 
 	entrada = new int[10000000];
 	arquivo_entrada.open("entradas/entrada-mini.txt");
-	//arquivo_saida.open("saidas/saida.txt", ios::out);
 	while (arquivo_entrada >> entrada[i++])
 		;
 
 	write_lomuto_output(entrada, tam);
+	write_statistics_lomuto();
 	// arquivo_saida << entrada[0];
 	// arquivo_saida << "\n";
 	// for (i = 1; i <= entrada[0]; i++)
