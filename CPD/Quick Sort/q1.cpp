@@ -96,7 +96,7 @@ int partition_lomuto_random(int C[], int left, int right)
 	int pivot, r;
 	r = rand();
 	pivot = left + r % (right - left + 1);
-	std::swap(C[right], C[pivot]);
+	std::swap(C[left], C[pivot]);
 	return partition_lomuto(C, left, right);
 }
 
@@ -106,8 +106,8 @@ void quick_sort_rec_lomuto(int C[], int left, int right)
 	if (right > left)
 	{
 		//Para testar o random, basta comentar o partition_lomuto e descomentar o partition_lomuto_random
-		pivot = partition_lomuto(C, left, right);
-		//pivot = partition_lomuto_random(C, left, right);
+		//pivot = partition_lomuto(C, left, right);
+		pivot = partition_lomuto_random(C, left, right);
 		quick_sort_rec_lomuto(C, left, pivot - 1);
 		quick_sort_rec_lomuto(C, pivot + 1, right);
 	}
@@ -119,8 +119,8 @@ void quick_sort_rec_hoare(int C[], int left, int right)
 	if (right > left)
 	{
 		//Para testar o median, basta comentar o partition_hoare e descomentar o partition_hoare_median
-		pivot = partition_hoare(C, left, right);
-		//pivot = partition_hoare_median(C, left, right);
+		//pivot = partition_hoare(C, left, right);
+		pivot = partition_hoare_median(C, left, right);
 		quick_sort_rec_lomuto(C, left, pivot);
 		quick_sort_rec_lomuto(C, pivot + 1, right);
 	}
@@ -164,22 +164,13 @@ void quick_sort_hoare(int C[], int tam, int print_ok)
 		   (end_clock - start_clock) / (double)CLOCKS_PER_SEC);
 }
 
-#define SIZE 100
-
-int main(int argc, const char *argv[])
+void write_lomuto_output(int *entrada, int tam)
 {
-	int *entrada, *arr;
-	int tam, j;
-	int k = 1;	int i, l = 0;
-	ifstream arquivo_entrada;
+	int i, j, *arr;
+	int k = 1;
+	int l = 0;
 	ofstream arquivo_saida;
-
-	entrada = new int[10000000];
-	arquivo_entrada.open("entradas/entrada-mini.txt");
-	arquivo_saida.open("saidas/saida.txt", ios::out);
-	while (arquivo_entrada >> entrada[i++])
-		;
-
+	arquivo_saida.open("saidas/saida-lomuto.txt", ios::out);
 	arquivo_saida << entrada[0];
 	arquivo_saida << "\n";
 	for (i = 1; i <= entrada[0]; i++)
@@ -196,8 +187,7 @@ int main(int argc, const char *argv[])
 			j++;
 			k++;
 		}
-		//quick_sort_lomuto(arr, tam, 1);
-		quick_sort_hoare(arr, tam, 1);
+		quick_sort_lomuto(arr, tam, 1);
 		while (l < tam)
 		{
 			arquivo_saida << arr[l];
@@ -207,6 +197,53 @@ int main(int argc, const char *argv[])
 		l = 0;
 		arquivo_saida << "\n";
 	}
+}
+
+#define SIZE 100
+
+int main(int argc, const char *argv[])
+{
+	int *entrada, *arr;
+	int tam, j;
+	int k = 1;
+	int i, l = 0;
+	ifstream arquivo_entrada;
+	//ofstream arquivo_saida;
+
+	entrada = new int[10000000];
+	arquivo_entrada.open("entradas/entrada-mini.txt");
+	//arquivo_saida.open("saidas/saida.txt", ios::out);
+	while (arquivo_entrada >> entrada[i++])
+		;
+
+	write_lomuto_output(entrada, tam);
+	// arquivo_saida << entrada[0];
+	// arquivo_saida << "\n";
+	// for (i = 1; i <= entrada[0]; i++)
+	// {
+	// 	tam = entrada[k];
+	// 	arquivo_saida << entrada[k];
+	// 	arquivo_saida << ' ';
+	// 	k++;
+	// 	j = 0;
+	// 	arr = new int[tam];
+	// 	while (j < tam)
+	// 	{
+	// 		arr[j] = entrada[k];
+	// 		j++;
+	// 		k++;
+	// 	}
+	// 	//quick_sort_lomuto(arr, tam, 1);
+	// 	quick_sort_hoare(arr, tam, 1);
+	// 	while (l < tam)
+	// 	{
+	// 		arquivo_saida << arr[l];
+	// 		arquivo_saida << ' ';
+	// 		l++;
+	// 	}
+	// 	l = 0;
+	// 	arquivo_saida << "\n";
+	// }
 
 	// arquivo_cadeados.open("cadeados.txt");
 	// int j = 0;
