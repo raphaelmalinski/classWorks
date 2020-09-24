@@ -8,119 +8,144 @@
 
 using namespace std;
 
-void alloc_array(char **arr)
+//Foi usada a versão LSD do radix sort devido a maior facilidade de implementação 
+//do algoritmo. A versão MSD seria mais indicada nesse problema porque evitaria 
+//execuções de código desnecessárias, mas devido essa maior facilidade do código,
+//foi optado pelo LSD.
+
+size_t get_bigger_string_length(string arr[], int size)
 {
-    arr = new char *[1000];
-    for (int i = 0; i < 1000; i++)
+    size_t bigger = arr[0].size();
+    for (int i = 1; i < size; i++)
     {
-        arr[i] = new char[30];
+        if (arr[i].size() > bigger)
+            bigger = arr[i].size();
     }
+    return bigger;
 }
 
-void print_array(char arr[][30])
+void count_sort(string arr[], int size, size_t digit)
 {
-    int i = 0;
-    while (arr[i][0] != '\n')
-    {
-        cout << arr[i] << " ";
-        i++;
-    }
-}
-
-
-size_t getMax(string arr[], int n){
-    size_t max = arr[0].size();
-    for (int i = 1; i < n; i++){
-        if (arr[i].size()>max)
-            max = arr[i].size();
-    }
-    return max;
-}
-
-void countSort(string a[], int size, size_t k){
-    string *b = NULL; int *c = NULL;
-    b = new string[size];
+    string *arr_aux = NULL;
+    int *c = NULL;
+    arr_aux = new string[size];
     c = new int[257];
 
-
-
-    for (int i = 0; i <257; i++){
+    for (int i = 0; i < 257; i++)
+    {
         c[i] = 0;
-        //cout << c[i] << "\n";
-    }
-    for (int j = 0; j <size; j++){   
-        c[k < a[j].size() ? (int)(unsigned char)a[j][k] + 1 : 0]++;            //a[j] is a string
-        //cout << c[a[j]] << endl;
     }
 
-    for (int f = 1; f <257; f++){
-        c[f] += c[f - 1];
+    for (int j = 0; j < size; j++)
+    {
+        c[digit < arr[j].size() ? (int)(unsigned char)arr[j][digit] + 1 : 0]++;
     }
 
-    for (int r = size - 1; r >= 0; r--){
-        b[c[k < a[r].size() ? (int)(unsigned char)a[r][k] + 1 : 0] - 1] = a[r];
-        c[k < a[r].size() ? (int)(unsigned char)a[r][k] + 1 : 0]--;
+    for (int k = 1; k < 257; k++)
+    {
+        c[k] += c[k - 1];
     }
 
-    for (int l = 0; l < size; l++){
-        a[l] = b[l];
+    for (int l = size - 1; l >= 0; l--)
+    {
+        arr_aux[c[digit < arr[l].size() ? (int)(unsigned char)arr[l][digit] + 1 : 0] - 1] = arr[l];
+        c[digit < arr[l].size() ? (int)(unsigned char)arr[l][digit] + 1 : 0]--;
+    }
+    
+    for (int m = 0; m < size; m++)
+    {
+        arr[m] = arr_aux[m];
     }
 
-    // avold memory leak
-    delete[] b;
+    delete[] arr_aux;
     delete[] c;
 }
 
-
-void radixSort(string b[], int r){
-    size_t max = getMax(b, r);
-    for (size_t digit = max; digit > 0; digit--){ // size_t is unsigned, so avoid using digit >= 0, which is always true
-        countSort(b, r, digit - 1);
+void radixSort(string arr[], int size)
+{
+    size_t bigger = get_bigger_string_length(arr, size);
+    for (size_t digit = bigger; digit > 0; digit--)
+    {
+        count_sort(arr, size, digit - 1);
     }
-
 }
 
-void read_input_file(char input[][30], char file_name[])
+int read_input_file(string input[], char file_name[])
 {
+    int num_words = 0;
     int i = 0;
     ifstream input_file;
 
     input_file.open(file_name);
     while (input_file >> input[i++])
-        ;
-    input[i][0] = '\n';
+    {
+        num_words++;
+    }
+    input_file.close();
+
+    return num_words;
 }
 
-void write_output_file(char input[][30], char file_name[])
+void write_output_file(string input[], char file_name[], int size)
 {
     int i = 0;
     ofstream output_file;
 
     output_file.open(file_name, ios::out);
 
-    //do here the sort
-    radixSort(input, 10000)
+    radixSort(input, size);
 
-    while (input[i][0] != '\n')
+    for (int l = 0; l < size; l++)
     {
-        output_file << input[i];
+        output_file << input[l];
         output_file << ' ';
-        i++;
     }
 }
 
-
-
-
-int main(/*int argc, char const *argv[]*/)
+void write_dataset_file(string input[], char file_name[], int size)
 {
-    char input[100000][30];
-    char input_file_name[50] = "inputs/input.txt";
-    char output_file_name[50] = "outputs/output.txt";
+    int num_occurrences = 1;
+    string word;
+    ofstream dataset_file;
 
-    read_input_file(input, input_file_name);
-    write_output_file(input, output_file_name);
-    //print_array(input);
+    word = input[0];
+    dataset_file.open(file_name, ios::out);
+    for (int i = 1; i < size; i++)
+    {
+        if (word == input[i])
+        {
+            num_occurrences++;
+        }
+        else
+        {
+            dataset_file << word << ' ' << num_occurrences << endl;
+            word = input[i];
+            num_occurrences = 1;
+        }
+    }
+}
+
+int main()
+{
+    char input_frankestein_file[50] = "inputs/frankestein.txt";
+    char output_frankestein_file[50] = "outputs/frankestein_ordenado.txt";
+    char dataset_frankestein_file[50] = "datasets/frankestein_dataset.txt";
+
+    char input_war_and_peace_file[50] = "inputs/war_and_peace.txt";
+    char output_war_and_peace_file[50] = "outputs/war_and_peace_ordenado.txt";
+    char dataset_war_and_peace_file[50] = "datasets/war_and_peace_dataset.txt";
+
+    //frankestein
+    string *input_frankestein_arr = new string[100000];
+    int size = read_input_file(input_frankestein_arr, input_frankestein_file);
+    write_output_file(input_frankestein_arr, output_frankestein_file, size);
+    write_dataset_file(input_frankestein_arr, dataset_frankestein_file, size);
+
+    //war_and_peace
+    string *input_war_and_peace_arr = new string[600000];
+    size = read_input_file(input_war_and_peace_arr, input_war_and_peace_file);
+    write_output_file(input_war_and_peace_arr, output_war_and_peace_file, size);
+    write_dataset_file(input_war_and_peace_arr, dataset_war_and_peace_file, size);
 
     return 0;
 }
