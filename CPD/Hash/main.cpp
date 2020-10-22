@@ -8,10 +8,10 @@
 
 using namespace std;
 
-const int table_size_linear = 20000; //tamanho de pelo menos o dobro do numero de chaves
+const int table_size_linear = 20000;      //tamanho de pelo menos o dobro do numero de chaves
 const int table_size_double_hash = 12007; //tamanho da tabela sendo um númerdo primo (recomendado para duplo hash)
-const int divider = 20011;   //menor número primo maior que o número de chaves mais 20%
-const int fixed_value = 101; //número primo usado no método polinomial
+const int divider = 20011;                //menor número primo maior que o número de chaves mais 20%
+const int fixed_value = 12007;              //número primo usado no método polinomial
 const int division = 0;
 const int polynomial = 1;
 
@@ -50,10 +50,6 @@ int division_method(string key)
 {
     string key_temp = to_lower(key);
     int key_number = convert_string_to_int(key_temp) % divider;
-    // if (key_number >= table_size)
-    // {
-    //     key_number = key_number - table_size;
-    // }
     return key_number;
 }
 
@@ -66,10 +62,6 @@ int polynomial_method(string key)
     {
         key_number = ((key_number * 256) % fixed_value + key_temp[i]) % fixed_value;
     }
-    // if (key_number >= table_size)
-    // {
-    //     key_number = key_number - table_size;
-    // }
     return key_number;
 }
 
@@ -163,11 +155,11 @@ void create_division_double_hash(key input[], char file_name[])
     input_file.close();
 }
 
-//cria tabela de hash usando o metodo da divisão e resolve conflitos com duplo hash
-void create_polynomial_double_hash(key input[], char file_name[])
+//cria tabela de hash usando o metodo da divisão e resolve conflitos com duplo hash. Retorna o número de colisões
+int create_polynomial_double_hash(key input[], char file_name[])
 {
-    int i;
-    int key, key_aux;
+    int num_collisions = 0;
+    int key, key_aux, i;
     bool inserted;
     string name_read, name_read_aux;
     ifstream input_file;
@@ -184,6 +176,7 @@ void create_polynomial_double_hash(key input[], char file_name[])
         {
             if (input[key].occupied)
             {
+                num_collisions++;
                 key = key + i * polynomial_method(name_read) + division_method(name_read);
                 i++;
                 while (key >= table_size_double_hash)
@@ -201,6 +194,7 @@ void create_polynomial_double_hash(key input[], char file_name[])
         }
     }
     input_file.close();
+    return num_collisions;
 }
 
 //pesquisa na tabela de hash criada usando metodo da divisao com resolução de conflitos linear
@@ -293,6 +287,19 @@ int search_polynomial_double_hash(key hash_table[], string name)
     return -1;
 }
 
+float return_occupancy_rate(key hash_table[], int table_size)
+{
+    float num_of_occupations = 0;
+    for (int i; i < table_size; i++)
+    {
+        if (hash_table[i].occupied)
+        {
+            num_of_occupations++;
+        }
+    }
+    return num_of_occupations / table_size;
+}
+
 void print_hash(key hash[], int table_size)
 {
     int j = 0;
@@ -310,7 +317,7 @@ void print_hash(key hash[], int table_size)
 int main(int argc, char const *argv[])
 {
 
-    //cout << convert_string_to_int("a");
+    int num_collisions;
     char file_name[50] = "files/nomes_10000.txt";
     key input_linear[table_size_linear];
     key input_double_hash[table_size_double_hash];
@@ -328,10 +335,12 @@ int main(int argc, char const *argv[])
     // cout << search_division_polynomial_linear_hash(input_linear, "Madoc Kolson", polynomial);
 
     //Cria tabela hash com metodo polinomial e resolve conflitos com duplo hash
-    create_polynomial_double_hash(input_double_hash, file_name);
-    cout << search_polynomial_double_hash(input_double_hash, "madoc Kolson");
+    num_collisions = create_polynomial_double_hash(input_double_hash, file_name);
+    //cout << search_polynomial_double_hash(input_double_hash, "madoc Kolson");
+    cout << return_occupancy_rate(input_double_hash, table_size_double_hash);
+    cout << "\n" << num_collisions;
 
     // print_hash(input_linear, table_size_linear);
-    print_hash(input_double_hash, table_size_double_hash);
+    //print_hash(input_double_hash, table_size_double_hash);
     return 0;
 }
