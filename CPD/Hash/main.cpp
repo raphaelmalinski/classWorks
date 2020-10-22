@@ -8,9 +8,10 @@
 
 using namespace std;
 
-const int table_size = 12000;
-const int divider = 12007;   //smaller prime number bigger than the number of keys plus 20%
-const int fixed_value = 101; //prime number used in polynomial method
+const int table_size_linear = 20000; //tamanho de pelo menos o dobro do numero de chaves
+const int table_size_double_hash = 12007; //tamanho da tabela sendo um númerdo primo (recomendado para duplo hash)
+const int divider = 20011;   //menor número primo maior que o número de chaves mais 20%
+const int fixed_value = 101; //número primo usado no método polinomial
 const int division = 0;
 const int polynomial = 1;
 
@@ -49,10 +50,10 @@ int division_method(string key)
 {
     string key_temp = to_lower(key);
     int key_number = convert_string_to_int(key_temp) % divider;
-    if (key_number >= table_size)
-    {
-        key_number = key_number - table_size;
-    }
+    // if (key_number >= table_size)
+    // {
+    //     key_number = key_number - table_size;
+    // }
     return key_number;
 }
 
@@ -65,10 +66,10 @@ int polynomial_method(string key)
     {
         key_number = ((key_number * 256) % fixed_value + key_temp[i]) % fixed_value;
     }
-    if (key_number >= table_size)
-    {
-        key_number = key_number - table_size;
-    }
+    // if (key_number >= table_size)
+    // {
+    //     key_number = key_number - table_size;
+    // }
     return key_number;
 }
 
@@ -104,9 +105,9 @@ void create_division_polynomial_linear_hash(key input[], char file_name[], int m
             if (input[key].occupied)
             {
                 key = key + 1;
-                while (key >= table_size)
+                while (key >= table_size_linear)
                 {
-                    key = key - table_size;
+                    key = key - table_size_linear;
                 }
             }
             else
@@ -145,9 +146,9 @@ void create_division_double_hash(key input[], char file_name[])
 
                 key = key + i * polynomial_method(name_read) + i;
                 i++;
-                while (key >= table_size)
+                while (key >= table_size_double_hash)
                 {
-                    key = key - table_size;
+                    key = key - table_size_double_hash;
                 }
             }
             else
@@ -185,9 +186,9 @@ void create_polynomial_double_hash(key input[], char file_name[])
             {
                 key = key + i * polynomial_method(name_read) + division_method(name_read);
                 i++;
-                while (key >= table_size)
+                while (key >= table_size_double_hash)
                 {
-                    key = key - table_size;
+                    key = key - table_size_double_hash;
                 }
             }
             else
@@ -231,9 +232,9 @@ int search_division_polynomial_linear_hash(key hash_table[], string name, int me
         else
         {
             key++;
-            if (key >= table_size)
+            if (key >= table_size_linear)
             {
-                key = key - table_size;
+                key = key - table_size_linear;
             }
         }
     }
@@ -257,9 +258,9 @@ int search_division_double_hash(key hash_table[], string name)
         {
             key = key + i * polynomial_method(name) + i;
             i++;
-            if (key >= table_size)
+            if (key >= table_size_double_hash)
             {
-                key = key - table_size;
+                key = key - table_size_double_hash;
             }
         }
     }
@@ -283,16 +284,16 @@ int search_polynomial_double_hash(key hash_table[], string name)
         {
             key = key + i * polynomial_method(name) + division_method(name);
             i++;
-            if (key >= table_size)
+            if (key >= table_size_double_hash)
             {
-                key = key - table_size;
+                key = key - table_size_double_hash;
             }
         }
     }
     return -1;
 }
 
-void print_hash(key hash[])
+void print_hash(key hash[], int table_size)
 {
     int j = 0;
     for (int i = 0; i < table_size; i++)
@@ -309,26 +310,28 @@ void print_hash(key hash[])
 int main(int argc, char const *argv[])
 {
 
-    // cout << polynomial_method("Micaella Zeon");
+    //cout << convert_string_to_int("a");
     char file_name[50] = "files/nomes_10000.txt";
-    key input[table_size];
+    key input_linear[table_size_linear];
+    key input_double_hash[table_size_double_hash];
 
     //Cria tabela hash com metodo da divisão e resolve conflitos de forma linear
-    // create_division_polynomial_linear_hash(input, file_name, division);
-    // cout << search_division_polynomial_linear_hash(input, "madoc Kolson");
+    // create_division_polynomial_linear_hash(input_linear, file_name, division);
+    // cout << search_division_polynomial_linear_hash(input_linear, "madoc Kolson");
 
     //Cria tabela hash com metodo da divisão e resolve conflitos com duplo hash
-    // create_division_double_hash(input, file_name);
-    // cout << search_division_double_hash(input, "Madoc Kolson");
+    // create_division_double_hash(input_double_hash, file_name);
+    // cout << search_division_double_hash(input_double_hash, "Madoc Kolson");
 
     //Cria tabela hash com metodo polinomial e resolve conflitos de forma linear
-    // create_division_polynomial_linear_hash(input, file_name, polynomial);
-    // cout << search_division_polynomial_linear_hash(input, "Madoc Kolson", polynomial);
+    // create_division_polynomial_linear_hash(input_linear, file_name, polynomial);
+    // cout << search_division_polynomial_linear_hash(input_linear, "Madoc Kolson", polynomial);
 
     //Cria tabela hash com metodo polinomial e resolve conflitos com duplo hash
-    create_polynomial_double_hash(input, file_name);
-    cout << search_polynomial_double_hash(input, "madoc Kolson");
+    create_polynomial_double_hash(input_double_hash, file_name);
+    cout << search_polynomial_double_hash(input_double_hash, "madoc Kolson");
 
-    //print_hash(input);
+    // print_hash(input_linear, table_size_linear);
+    print_hash(input_double_hash, table_size_double_hash);
     return 0;
 }
