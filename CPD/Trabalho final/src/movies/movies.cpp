@@ -50,17 +50,24 @@ void read_movies()
             i--;
         }
 
+        //Store movie id
         pos = 0;
         pos = line.find(delimiter);
         token = line.substr(0, pos);
         movie.id = stoi(token, 0);
         line.erase(0, pos + delimiter.length());
 
+        //Store movie title
         pos = line.find(delimiter);
         token = line.substr(0, pos);
+        if (token[0] == '"'){
+            token.erase(0,1);
+            token.pop_back();
+        }
         movie.title = token;
         line.erase(0, pos + delimiter.length());
 
+        //Store list of genres
         pos = line.find(delimiter);
         do
         {

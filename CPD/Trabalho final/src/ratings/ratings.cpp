@@ -14,7 +14,7 @@ struct rating
 };
 typedef struct rating Rating;
 
-void read_rating()
+void read_ratings()
 {
 	fstream fin;
 	vector<Rating> ratings;
