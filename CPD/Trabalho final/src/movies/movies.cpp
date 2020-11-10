@@ -3,18 +3,9 @@
 #include <vector>
 #include <bits/stdc++.h>
 #include "TrieMovie.cpp"
+#include "HashMovies.cpp"
 
 using namespace std;
-
-struct movie
-{
-    int id;
-    string title;
-    vector<string> genres;
-    float ratings_average = 0;
-    int number_of_ratings = 0;
-};
-typedef struct movie Movie;
 
 string replace_chars(string word, char new_char, char old_char)
 {
@@ -43,13 +34,11 @@ string replace_chars(string word, char new_char, char old_char)
     return new_word;
 }
 
-void read_movies(TrieMovie *root)
+void read_movies(TrieMovie *root, Movie hash_movies[])
 {
     fstream fin;
-    //vector<Movie> movies;
-    //Movie movie;
-    string line, token, title;
-    int i, movieId;
+    Movie movie;
+    string line, token;
     string delimiter = "|";
     size_t pos;
 
@@ -64,7 +53,7 @@ void read_movies(TrieMovie *root)
         pos = 0;
         pos = line.find(delimiter);
         token = line.substr(0, pos);
-        movieId = stoi(token, 0);
+        movie.id = stoi(token, 0);
         line.erase(0, pos + delimiter.length());
 
         //Store movie title
@@ -75,23 +64,26 @@ void read_movies(TrieMovie *root)
             token.erase(0, 1);
             token.pop_back();
         }
-        title = token;
+        movie.title = token;
         line.erase(0, pos + delimiter.length());
 
-        //Insert the movie to trie tree
-        insertMovie(root, title, movieId);
-
         //Store list of genres
-        // pos = line.find(delimiter);
-        // do
-        // {
-        //     token = line.substr(0, pos);
-        //     movie.genres.push_back(token);
-        //     line.erase(0, pos + delimiter.length());
-        // } while ((pos = line.find(delimiter)) != std::string::npos);
+        pos = line.find(delimiter);
+        do
+        {
+            token = line.substr(0, pos);
+            movie.genres.push_back(token);
+            line.erase(0, pos + delimiter.length());
+        } while ((pos = line.find(delimiter)) != std::string::npos);
 
+        //Insert movie to trie tree
+        insertMovie(root, movie.title, movie.id);
+
+        //Insert movie to hash 
+        insert_movie_to_hash(hash_movies, movie);
+        
         // movies.push_back(movie);
-        // movie.genres.clear();
+        movie.genres.clear();
     }
 
     //Usado pra imprimir
