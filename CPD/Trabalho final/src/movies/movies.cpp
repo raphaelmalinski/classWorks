@@ -4,6 +4,7 @@
 #include <bits/stdc++.h>
 #include "TrieMovie.cpp"
 #include "HashMovies.cpp"
+#include "../functions.cpp"
 
 using namespace std;
 
@@ -77,6 +78,11 @@ void read_movies(TrieMovie *root, Movie hash_movies[])
             movie.genres.push_back(token);
             line.erase(0, pos + delimiter.length());
         } while ((pos = line.find(delimiter)) != std::string::npos);
+        //Para pegar o ultimo genero (em casos de mais de um genero)
+        if(line != token){
+            movie.genres.push_back(line);
+        }
+        
 
         //Insert movie to trie tree
         insert_movie(root, movie.title, movie.id);
@@ -101,7 +107,36 @@ void read_movies(TrieMovie *root, Movie hash_movies[])
     // }
 }
 
-vector<Movie> sort_movies_list(vector<Movie> movies)
+vector<Movie> sort_movies_list_by_rating(vector<Movie> movies)
+{
+    Movie aux;
+    int k = 1;
+    int tam = movies.size();
+    int i, j;
+    int h = tam / pow(2, k);
+
+    while (h > 0)
+    {
+        i = h;
+        while (i < tam)
+        {
+            aux = movies[i];
+            j = i;
+            while (j >= h && aux.ratings_average < movies[j - h].ratings_average)
+            {
+                movies[j] = movies[j - h];
+                j = j - h;
+            }
+            movies[j] = aux;
+            i = i + 1;
+        }
+        k++;
+        h = tam / pow(2, k);
+    }
+    return movies;
+}
+
+vector<Movie> sort_movies_list_by_count(vector<Movie> movies)
 {
     Movie aux;
     int k = 1;
@@ -161,7 +196,8 @@ vector<Movie> search_movies_to_prefix(TrieMovie *root, Movie hash_movies[], stri
     vector<Movie> founded_movies_list;
     TrieMovie *founded_movies = search_prefix(root, prefix);
 
-    if(founded_movies == NULL && !founded_movies->isEndOfWord){
+    if (founded_movies == NULL && !founded_movies->isEndOfWord)
+    {
         return founded_movies_list;
     }
 
@@ -187,13 +223,13 @@ void print_movies_to_prefix(TrieMovie *root, Movie hash_movies[], string prefix)
     }
     else
     {
-        founded_movies = sort_movies_list(founded_movies);
+        founded_movies = sort_movies_list_by_count(founded_movies);
         cout << "Movie Id | "
              << "Title | "
              << "Genres | "
              << "Rating | "
              << "Count | " << endl;
-        for (vector<Movie>::iterator it = founded_movies.end()-1; it != founded_movies.begin()-1; it--)
+        for (vector<Movie>::iterator it = founded_movies.end() - 1; it != founded_movies.begin() - 1; it--)
         {
             cout << it->id << " | "
                  << it->title << " | ";
@@ -202,7 +238,64 @@ void print_movies_to_prefix(TrieMovie *root, Movie hash_movies[], string prefix)
                 cout << *it_2 << ",";
             }
             cout << " | " << it->ratings_average << " | "
-                 << it->number_of_ratings << endl << endl;
+                 << it->number_of_ratings << endl
+                 << endl;
+        }
+    }
+}
+
+//Função que verifica se um dado filme é de um dado genero
+bool find_genre(Movie movie, string genre)
+{
+    for (vector<string>::iterator it = movie.genres.begin(); it != movie.genres.end(); it++)
+    {
+        if (to_lower(genre) == to_lower(*it))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+//Função que retorna um vetor com todos filmes que sejam de um dado genero
+//que tenham no minimo 1000 avaliações
+vector<Movie> search_movie_to_genre(Movie hash_movies[], string genre)
+{
+    vector<Movie> movies;
+    for (int i = 0; i < hash_size; i++)
+    {
+        if (hash_movies[i].occupied)
+        {
+            if (find_genre(hash_movies[i], genre) && hash_movies[i].number_of_ratings >= 1000)
+            {
+                movies.push_back(hash_movies[i]);
+            }
+        }
+    }
+    return movies;
+}
+
+//Função que imprime o top n filmes com melhores notas que sejam do genero especificado e
+//tenham no minimo 1000 avaliações
+void print_top_n_genre(Movie hash_movies[], int top_n, string genre)
+{
+    vector<Movie> founded_movies = search_movie_to_genre(hash_movies, genre);
+    if (founded_movies.empty())
+    {
+        cout << "Movies with " << genre << " genre and more then 1000 ratings not found!";
+    }
+    else
+    {
+        founded_movies = sort_movies_list_by_rating(founded_movies);
+        for (int i = founded_movies.size()-1; i > founded_movies.size()-1-top_n; i--)
+        {
+            cout << founded_movies[i].title << " | ";
+            for (int j = 0; j < founded_movies[i].genres.size(); j++)
+            {
+                cout << founded_movies[i].genres[j] << ", ";
+            }
+            cout << " | " << founded_movies[i].ratings_average 
+                 << " | " << founded_movies[i].number_of_ratings << endl;
         }
     }
 }
