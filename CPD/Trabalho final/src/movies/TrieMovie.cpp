@@ -72,18 +72,21 @@ bool is_trie_empty(TrieMovie *trie)
 
 int size_of_trie(TrieMovie *trie)
 {
-    int count = 0;
+    int counter = 0;
+    if(trie->isEndOfWord){
+        counter++;
+    }
     for (int i = 0; i < ALPHABET_SIZE; i++)
     {
         if (trie->children[i] != NULL)
         {
-            if(trie->children[i]->isEndOfWord){
-                count++;
-            }
-            count = count + size_of_trie(trie->children[i]);
+            // if(trie->children[i]->isEndOfWord){
+            //     counter++;
+            // }
+            counter = counter + size_of_trie(trie->children[i]);
         }
     }
-    return count;
+    return counter;
 }
 
 
@@ -115,20 +118,20 @@ bool search(struct TrieMovie *root, string key)
     return (pCrawl != NULL && pCrawl->isEndOfWord);
 }
 
-TrieMovie *search_prefix(struct TrieMovie *root, string key)
+TrieMovie *search_prefix(struct TrieMovie *root, string prefix)
 {
     TrieMovie *pCrawl = root;
     int index;
 
-    for (int i = 0; i < key.length(); i++)
+    for (int i = 0; i < prefix.length(); i++)
     {
-        if (key[i] >= 65 && key[i] <= 90)
+        if (prefix[i] >= 65 && prefix[i] <= 90)
         {
-            index = tolower(key[i]);
+            index = tolower(prefix[i]);
         }
         else
         {
-            index = key[i];
+            index = prefix[i];
         }
         // int index = tolower(key[i]) - 'a';
         if (!pCrawl->children[index])
@@ -138,7 +141,6 @@ TrieMovie *search_prefix(struct TrieMovie *root, string key)
 
         pCrawl = pCrawl->children[index];
     }
-
     // return (pCrawl != NULL && !is_trie_empty(pCrawl));
     return pCrawl;
 }

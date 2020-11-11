@@ -7,7 +7,7 @@
 
 using namespace std;
 
-int counter = 0;
+int global_counter = 0;
 
 string replace_chars(string word, char new_char, char old_char)
 {
@@ -135,8 +135,8 @@ void create_list_of_found_movies(TrieMovie *root, int founded_movies_list[])
     int index;
     if (root->isEndOfWord)
     {
-        founded_movies_list[counter] = root->movieId;
-        counter++;
+        founded_movies_list[global_counter] = root->movieId;
+        global_counter++;
     }
     for (int i = 0; i < ALPHABET_SIZE; i++)
     {
@@ -161,7 +161,7 @@ vector<Movie> search_movies_to_prefix(TrieMovie *root, Movie hash_movies[], stri
     vector<Movie> founded_movies_list;
     TrieMovie *founded_movies = search_prefix(root, prefix);
 
-    if(founded_movies == NULL){
+    if(founded_movies == NULL && !founded_movies->isEndOfWord){
         return founded_movies_list;
     }
 
