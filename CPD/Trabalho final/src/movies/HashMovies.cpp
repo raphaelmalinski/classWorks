@@ -11,8 +11,8 @@
 
 using namespace std;
 
-const int hash_size = 30011; //tamanho da tabela sendo um númerdo primo (recomendado para duplo hash)
-const int divider = 30013;                //menor número primo maior que o tamanho da tabela
+const int hash_size = 60011; //tamanho da tabela sendo um númerdo primo (recomendado para duplo hash)
+const int divider = 30011;   //menor número primo maior que o tamanho da tabela
 
 struct Movie
 {
@@ -36,7 +36,7 @@ int division_method(int key)
 //cria tabela de hash usando o metodo da divisão e resolve conflitos com duplo hash. Retorna número de colisões
 void insert_movie_to_hash(Movie hash[], Movie movie)
 {
-    int key, key_aux; 
+    int key, key_aux;
     int i = 1;
     bool inserted = false;
     string name_read, name_read_aux;
@@ -64,7 +64,7 @@ void insert_movie_to_hash(Movie hash[], Movie movie)
 }
 
 //pesquisa na tabela de hash criada usando metodo da divisao com resolução de conflitos com duplo hash
-Movie search_movie_in_hash(Movie hash[], int movieId)
+int search_movie_in_hash(Movie hash[], int movieId)
 {
     int i = 1;
     int key = division_method(movieId);
@@ -72,18 +72,23 @@ Movie search_movie_in_hash(Movie hash[], int movieId)
     {
         if (hash[key].id == movieId)
         {
-            return hash[key];
+            return key;
         }
         else
         {
             key = key + i * division_method(movieId) + i;
             i++;
-            if (key >= hash_size)
+            // if (key >= hash_size)
+            // {
+            //     key = key - hash_size;
+            // }
+            while (key >= hash_size)
             {
                 key = key - hash_size;
             }
         }
     }
+    return -1;
 }
 
 void print_hash(Movie hash[], int table_size)
@@ -94,12 +99,14 @@ void print_hash(Movie hash[], int table_size)
         if (hash[i].occupied)
         {
             cout << "Movie Id: " << hash[i].id
-                 << ", Title: " << hash[i].title
-                 << ", Movie Genres: ";
+                 << " | Title: " << hash[i].title
+                 << " | Movie Genres: ";
             for (vector<string>::iterator it = hash[i].genres.begin(); it != hash[i].genres.end(); it++)
             {
                 cout << *it << ", ";
             }
+            cout << " | Rating: " << hash[i].ratings_average
+                 << " | Count: " << hash[i].number_of_ratings;
             cout << endl;
             j++;
         }

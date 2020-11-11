@@ -32,7 +32,7 @@ TrieMovie *initializeMovie(void)
 // If not present, inserts key into trie
 // If the key is prefix of trie node, just
 // marks leaf node
-void insertMovie(TrieMovie *root, string key, int movieId)
+void insert_movie(TrieMovie *root, string key, int movieId)
 {
     TrieMovie *pCrawl = root;
     int index;
@@ -69,6 +69,23 @@ bool is_trie_empty(TrieMovie *trie)
     }
     return true;
 }
+
+int size_of_trie(TrieMovie *trie)
+{
+    int count = 0;
+    for (int i = 0; i < ALPHABET_SIZE; i++)
+    {
+        if (trie->children[i] != NULL)
+        {
+            if(trie->children[i]->isEndOfWord){
+                count++;
+            }
+            count = count + size_of_trie(trie->children[i]);
+        }
+    }
+    return count;
+}
+
 
 // Returns true if key presents in trie, else
 // false
