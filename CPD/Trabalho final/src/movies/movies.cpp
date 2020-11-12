@@ -262,7 +262,7 @@ bool find_genre(Movie movie, string genre)
 vector<Movie> search_movie_to_genre(Movie hash_movies[], string genre)
 {
     vector<Movie> movies;
-    for (int i = 0; i < hash_size; i++)
+    for (int i = 0; i < hash_movies_size; i++)
     {
         if (hash_movies[i].occupied)
         {
