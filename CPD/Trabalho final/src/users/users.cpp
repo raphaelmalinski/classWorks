@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <bits/stdc++.h>
+#include "HashUsers.cpp"
 
 using namespace std;
 
