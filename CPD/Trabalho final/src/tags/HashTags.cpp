@@ -9,7 +9,6 @@
 #include <vector>
 #include <bits/stdc++.h>
 
-
 using namespace std;
 
 const int hash_tags_size = 700001; //tamanho da tabela sendo um númerdo primo (recomendado para duplo hash)
@@ -23,8 +22,6 @@ struct Tag
     bool occupied = false;
 };
 typedef struct Tag Tag;
-
-
 
 int convert_string_to_int(string word)
 {
@@ -69,7 +66,8 @@ void insert_tag_to_hash(Tag hash[], Tag tag)
         }
         else
         {
-            hash[key] = tag;
+            hash[key].tag = tag.tag;
+            hash[key].moviesAssociated = tag.moviesAssociated;
             hash[key].occupied = true;
             hash[key].used = true;
             inserted = true;
@@ -84,10 +82,9 @@ int search_tag_in_hash(Tag hash[], string tag)
     int i = 1;
 
     int key = division_method_tag(tag);
-
     while (hash[key].used)
     {
-        if (hash[key].tag == tag)
+        if (to_lower(hash[key].tag) == to_lower(tag))
         {
             return key;
         }

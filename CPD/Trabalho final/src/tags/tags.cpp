@@ -34,6 +34,11 @@ void read_tags(Tag hash_tags[])
 
         pos = line.find(delimiter);
         token = line.substr(0, pos);
+        if (token[0] == '"')
+        {
+            token.erase(0, 1);
+            token.pop_back();
+        }
         tag_s = token;
         line.erase(0, pos + delimiter.length());
 
@@ -47,8 +52,7 @@ void read_tags(Tag hash_tags[])
         if (key > 0)
         {
             if (std::find(hash_tags[key].moviesAssociated.begin(),
-                          hash_tags[key].moviesAssociated.end(), movieId) 
-                          == hash_tags[key].moviesAssociated.end())
+                          hash_tags[key].moviesAssociated.end(), movieId) == hash_tags[key].moviesAssociated.end())
             {
                 hash_tags[key].moviesAssociated.push_back(movieId);
             }
@@ -60,16 +64,38 @@ void read_tags(Tag hash_tags[])
             insert_tag_to_hash(hash_tags, tag);
         }
         tag.moviesAssociated.clear();
-        // tags.push_back(tag);
     }
+}
 
-    //Usado pra imprimir
-    // for (vector<Tag>::iterator it = tags.begin(); it != tags.end(); it++)
-    // {
-    //     cout <<
-    //     "User Id: " << it->userId <<
-    //     ", Movie Id: " << it->movieId <<
-    //     ", Tag: " << it->tag <<
-    //     ", TimesTamp: " << it->timesTamp << "\n";
-    // }
+vector<Movie> return_movies_by_tag(Tag hashTags[], Movie hashMovies[], string tag)
+{
+    int key_movie;
+    vector<Movie> moviesFound;
+    int key_tag = search_tag_in_hash(hashTags, tag);
+    if(key_tag > 0){
+        for(int i = 0; i < hashTags[key_tag].moviesAssociated.size(); i++){
+            key_movie = search_movie_in_hash(hashMovies, hashTags[key_tag].moviesAssociated[i]);
+            moviesFound.push_back(hashMovies[key_movie]);
+        }
+    }
+    return moviesFound;
+}
+
+//Função que imprime filmes associados a tags que estão numa dada lista
+void print_list_tags_movies(Tag hashTags[], Movie hashMovies[], vector<string> tagList)
+{
+    bool movieWasFound = false;
+    vector<Movie> moviesFound;
+    for (int i = 0; i < tagList.size(); i++)
+    {
+        moviesFound = return_movies_by_tag(hashTags, hashMovies, tagList[i]);
+        if (!moviesFound.empty())
+        {
+            print_movies(moviesFound);
+            movieWasFound = true;
+        }
+    }
+    if(!movieWasFound){
+        cout << "Movies with tags informed not found";
+    }
 }

@@ -79,10 +79,10 @@ void read_movies(TrieMovie *root, Movie hash_movies[])
             line.erase(0, pos + delimiter.length());
         } while ((pos = line.find(delimiter)) != std::string::npos);
         //Para pegar o ultimo genero (em casos de mais de um genero)
-        if(line != token){
+        if (line != token)
+        {
             movie.genres.push_back(line);
         }
-        
 
         //Insert movie to trie tree
         insert_movie(root, movie.title, movie.id);
@@ -93,27 +93,17 @@ void read_movies(TrieMovie *root, Movie hash_movies[])
         // movies.push_back(movie);
         movie.genres.clear();
     }
-
-    //Usado pra imprimir
-    // for (vector<Movie>::iterator it = movies.begin(); it != movies.end(); it++)
-    // {
-    //     // cout << *it << "\n"; // valor na posição apontada por it
-    //     cout << "Id: " << it->id << " Movie: " << it->title << " Genres: ";
-    //     for (vector<string>::iterator it_2 = it->genres.begin(); it_2 != it->genres.end(); it_2++)
-    //     {
-    //         cout << *it_2 << ", ";
-    //     }
-    //     cout << "\n";
-    // }
 }
 
-vector<Movie> search_movie_by_list_id(Movie hash_movies[], vector<int> movieIdList){
+vector<Movie> search_movie_by_list_id(Movie hash_movies[], vector<int> movieIdList)
+{
     vector<Movie> movies_found;
     int key;
     for (int i = 0; i < movieIdList.size(); i++)
     {
         key = search_movie_in_hash(hash_movies, movieIdList[i]);
-        if(key > 0){
+        if (key > 0)
+        {
             movies_found.push_back(hash_movies[key]);
         }
     }
@@ -300,15 +290,30 @@ void print_top_n_genre(Movie hash_movies[], int top_n, string genre)
     else
     {
         found_movies = sort_movies_list_by_rating(found_movies);
-        for (int i = found_movies.size()-1; i > found_movies.size()-1-top_n; i--)
+        for (int i = found_movies.size() - 1; i > found_movies.size() - 1 - top_n; i--)
         {
             cout << found_movies[i].title << " | ";
             for (int j = 0; j < found_movies[i].genres.size(); j++)
             {
                 cout << found_movies[i].genres[j] << ", ";
             }
-            cout << " | " << found_movies[i].ratings_average 
+            cout << " | " << found_movies[i].ratings_average
                  << " | " << found_movies[i].number_of_ratings << endl;
         }
+    }
+}
+
+void print_movies(vector<Movie> movies)
+{
+    for (int i = 0; i < movies.size(); i++)
+    {
+        cout << movies[i].title << " | ";
+        for (int j = 0; j < movies[i].genres.size(); j++)
+        {
+            cout << movies[i].genres[j] << ", ";
+        }
+        cout << " | " << movies[i].ratings_average
+             << " | " << movies[i].number_of_ratings
+             << endl;
     }
 }

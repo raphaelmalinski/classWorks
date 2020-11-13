@@ -26,7 +26,7 @@ void read_ratings(Movie hash_movies[], User hash_users[])
     size_t pos = 0;
     User user;
 
-    fin.open("../Dados_clean/minirating.csv", ios::in);
+    fin.open("../Dados_clean/rating.csv", ios::in);
     getline(fin, line);
 
     while (getline(fin, line))

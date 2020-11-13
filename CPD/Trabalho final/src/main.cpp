@@ -9,15 +9,17 @@
 int main(int argc, char *argv[])
 {
     //Criando tabelas hash
-    Movie *hash_movies = new Movie[hash_movies_size];
-    User *hash_users = new User[hash_users_size];
-    Tag *hash_tags = new Tag[hash_tags_size];
+    Movie *hashMovies = new Movie[hash_movies_size];
+    User *hashUsers = new User[hash_users_size];
+    Tag *hashTags = new Tag[hash_tags_size];
 
     //Criando árvore Trie de filmes
     TrieMovie *movies = initializeMovie();
 
-    read_movies(movies, hash_movies);
-    read_ratings(hash_movies, hash_users);
-    read_tags(hash_tags);
-    print_tags_hash(hash_tags, hash_tags_size);
+    //Montando estruturas necessárias
+    read_movies(movies, hashMovies);
+    read_ratings(hashMovies, hashUsers);
+    read_tags(hashTags);
+    //cout << search_tag_in_hash(hash_tags, "expansive") << endl;
+    //print_list_tags_movies(hashTags, hashMovies, {"alsdkfjlsdf", "alskdfjlad"});
 }
