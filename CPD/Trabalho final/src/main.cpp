@@ -21,5 +21,5 @@ int main(int argc, char *argv[])
     read_ratings(hashMovies, hashUsers);
     read_tags(hashTags);
     //cout << search_tag_in_hash(hash_tags, "expansive") << endl;
-    //print_list_tags_movies(hashTags, hashMovies, {"alsdkfjlsdf", "alskdfjlad"});
+    print_list_tags_movies(hashTags, hashMovies, {"BraZil", "drugs", "aids"});
 }

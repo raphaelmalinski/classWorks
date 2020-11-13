@@ -303,17 +303,14 @@ void print_top_n_genre(Movie hash_movies[], int top_n, string genre)
     }
 }
 
-void print_movies(vector<Movie> movies)
+void print_movie(Movie movie)
 {
-    for (int i = 0; i < movies.size(); i++)
+    cout << movie.title << " | ";
+    for (int i = 0; i < movie.genres.size(); i++)
     {
-        cout << movies[i].title << " | ";
-        for (int j = 0; j < movies[i].genres.size(); j++)
-        {
-            cout << movies[i].genres[j] << ", ";
-        }
-        cout << " | " << movies[i].ratings_average
-             << " | " << movies[i].number_of_ratings
-             << endl;
+        cout << movie.genres[i] << ", ";
     }
+    cout << " | " << movie.ratings_average
+         << " | " << movie.number_of_ratings
+         << endl;
 }
