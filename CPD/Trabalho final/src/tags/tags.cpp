@@ -1,37 +1,35 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <bits/stdc++.h>
 #include "HashTags.cpp"
 
 using namespace std;
 
-void read_tags(Tag hash_tags[])
+//Monta estrutura de tags a partir do csv de tags
+void read_tags(Tag hashTags[])
 {
     fstream fin;
     Tag tag;
-    string line, token, tag_s;
+    string line, token, tagString;
     string delimiter = ",";
     size_t pos;
-    int movieId, key, tag_converted;
+    int movieId, key, tagConverted;
 
     fin.open("../Dados_clean/tag_clean.csv", ios::in);
     getline(fin, line);
 
     while (getline(fin, line))
     {
+        //Ignora id do usuário (não será usado)
         pos = 0;
         pos = line.find(delimiter);
-        // token = line.substr(0, pos);
         line.substr(0, pos);
-        // tag.userId = stoi(token, 0);
         line.erase(0, pos + delimiter.length());
 
+        //Guarda id do filme
         pos = line.find(delimiter);
         token = line.substr(0, pos);
         movieId = stoi(token);
         line.erase(0, pos + delimiter.length());
 
+        //Guarda tag
         pos = line.find(delimiter);
         token = line.substr(0, pos);
         if (token[0] == '"')
@@ -39,34 +37,34 @@ void read_tags(Tag hash_tags[])
             token.erase(0, 1);
             token.pop_back();
         }
-        tag_s = token;
+        tagString = token;
         line.erase(0, pos + delimiter.length());
 
+        //Ignora timestamp (não será usado)
         pos = line.find(delimiter);
-        //token = line.substr(0, pos);
         line.substr(0, pos);
-        // tag.timesTamp = token;
         line.erase(0, pos + delimiter.length());
 
-        key = search_tag_in_hash(hash_tags, tag_s);
+        key = search_tag_in_hash(hashTags, tagString);
         if (key > 0)
         {
-            if (find(hash_tags[key].moviesAssociated.begin(),
-                     hash_tags[key].moviesAssociated.end(), movieId) == hash_tags[key].moviesAssociated.end())
+            if (find(hashTags[key].moviesAssociated.begin(),
+                     hashTags[key].moviesAssociated.end(), movieId) == hashTags[key].moviesAssociated.end())
             {
-                hash_tags[key].moviesAssociated.push_back(movieId);
+                hashTags[key].moviesAssociated.push_back(movieId);
             }
         }
         else
         {
-            tag.tag = tag_s;
+            tag.tag = tagString;
             tag.moviesAssociated.push_back(movieId);
-            insert_tag_to_hash(hash_tags, tag);
+            insert_tag_to_hash(hashTags, tag);
         }
         tag.moviesAssociated.clear();
     }
 }
 
+//Retorna vetor com a intersecção de dois vetores
 vector<int> return_equal_values(vector<int> vector1, vector<int> vector2)
 {
     if (vector1.empty())
@@ -84,7 +82,8 @@ vector<int> return_equal_values(vector<int> vector1, vector<int> vector2)
         {
             for (int j = 0; j < vector2.size(); j++)
             {
-                if(vector1[i] == vector2[j]){
+                if (vector1[i] == vector2[j])
+                {
                     vectorAux.push_back(vector1[i]);
                     j = vector2.size();
                 }
@@ -94,6 +93,7 @@ vector<int> return_equal_values(vector<int> vector1, vector<int> vector2)
     }
 }
 
+//Retorna vetor de ids de filmes que estão associados a uma lista de tags
 vector<int> return_movies_ids_by_list_tags(Tag hashTags[], vector<string> tag)
 {
     int key_movie, key_tag;
@@ -133,6 +133,31 @@ void print_list_tags_movies(Tag hashTags[], Movie hashMovies[], vector<string> t
     }
     if (!movieWasFound)
     {
-        cout << "Movies with tags informed not found";
+        cout << "Movies with tags informed not found! ";
     }
+}
+
+//Retorna lista de tags encontradas em uma string
+vector<string> return_tags(string tags)
+{
+    vector<string> tagList;
+    size_t pos = 0;
+    string delimiter = "'";
+    string token;
+
+    //Remove o espaço que tem no inicio
+    pos = tags.find(delimiter);
+    tags.erase(0, pos + delimiter.length());
+
+    pos = tags.find(delimiter);
+    do
+    {
+        token = tags.substr(0, pos);
+        if(token != " "){
+            tagList.push_back(token);
+        }
+        tags.erase(0, pos + delimiter.length());
+    } while ((pos = tags.find(delimiter)) != std::string::npos);
+
+    return tagList;
 }

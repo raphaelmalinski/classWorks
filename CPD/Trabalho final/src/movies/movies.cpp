@@ -1,43 +1,40 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <bits/stdc++.h>
 #include "TrieMovie.cpp"
 #include "HashMovies.cpp"
-//#include "../functions.cpp"
 
 using namespace std;
 
-int global_counter = 0;
+int globalCounter = 0;
 
-string replace_chars(string word, char new_char, char old_char)
+//Função usada para trocar virgulas da extremidade uma string por outro caractere
+string replace_chars(string word, char newChar, char oldChar)
 {
     int i = 0;
-    string new_word = word;
-    while (i < new_word.length())
+    string newWord = word;
+    while (i < newWord.length())
     {
-        if (new_word[i] == old_char)
+        if (newWord[i] == oldChar)
         {
-            new_word[i] = new_char;
-            i = new_word.length();
+            newWord[i] = newChar;
+            i = newWord.length();
         }
         i++;
     }
 
-    i = new_word.length() - 1;
+    i = newWord.length() - 1;
     while (i > 0)
     {
-        if (new_word[i] == old_char)
+        if (newWord[i] == oldChar)
         {
-            new_word[i] = new_char;
+            newWord[i] = newChar;
             i = 0;
         }
         i--;
     }
-    return new_word;
+    return newWord;
 }
 
-void read_movies(TrieMovie *root, Movie hash_movies[])
+//Função usada para ler do arquivo csv os filmes e incluílos na tabela hash e na arvore trie
+void read_movies(TrieMovie *root, Movie hashMovies[])
 {
     fstream fin;
     Movie movie;
@@ -52,6 +49,7 @@ void read_movies(TrieMovie *root, Movie hash_movies[])
     {
 
         line = replace_chars(line, '|', ',');
+
         //Store movie id
         pos = 0;
         pos = line.find(delimiter);
@@ -78,6 +76,7 @@ void read_movies(TrieMovie *root, Movie hash_movies[])
             movie.genres.push_back(token);
             line.erase(0, pos + delimiter.length());
         } while ((pos = line.find(delimiter)) != std::string::npos);
+
         //Para pegar o ultimo genero (em casos de mais de um genero)
         if (line != token)
         {
@@ -88,35 +87,36 @@ void read_movies(TrieMovie *root, Movie hash_movies[])
         insert_movie(root, movie.title, movie.id);
 
         //Insert movie to hash
-        insert_movie_to_hash(hash_movies, movie);
+        insert_movie_to_hash(hashMovies, movie);
 
-        // movies.push_back(movie);
         movie.genres.clear();
     }
 }
 
-vector<Movie> search_movie_by_list_id(Movie hash_movies[], vector<int> movieIdList)
+//Função usada para pesquisar filmes na hash de filmes por uma lista de ids de filmes
+vector<Movie> search_movie_by_list_id(Movie hashMovies[], vector<int> movieIdList)
 {
-    vector<Movie> movies_found;
+    vector<Movie> moviesFound;
     int key;
     for (int i = 0; i < movieIdList.size(); i++)
     {
-        key = search_movie_in_hash(hash_movies, movieIdList[i]);
+        key = search_movie_in_hash(hashMovies, movieIdList[i]);
         if (key > 0)
         {
-            movies_found.push_back(hash_movies[key]);
+            moviesFound.push_back(hashMovies[key]);
         }
     }
-    return movies_found;
+    return moviesFound;
 }
 
+//Função que ordena crescentemente uma lista de filmes pela nota (utiliza shell sort)
 vector<Movie> sort_movies_list_by_rating(vector<Movie> movies)
 {
-    Movie aux;
+    int i, j;
     int k = 1;
     int tam = movies.size();
-    int i, j;
     int h = tam / pow(2, k);
+    Movie aux;
 
     while (h > 0)
     {
@@ -125,7 +125,7 @@ vector<Movie> sort_movies_list_by_rating(vector<Movie> movies)
         {
             aux = movies[i];
             j = i;
-            while (j >= h && aux.ratings_average < movies[j - h].ratings_average)
+            while (j >= h && aux.ratingsAverage < movies[j - h].ratingsAverage)
             {
                 movies[j] = movies[j - h];
                 j = j - h;
@@ -139,42 +139,14 @@ vector<Movie> sort_movies_list_by_rating(vector<Movie> movies)
     return movies;
 }
 
-vector<Movie> sort_movies_list_by_count(vector<Movie> movies)
-{
-    Movie aux;
-    int k = 1;
-    int tam = movies.size();
-    int i, j;
-    int h = tam / pow(2, k);
-
-    while (h > 0)
-    {
-        i = h;
-        while (i < tam)
-        {
-            aux = movies[i];
-            j = i;
-            while (j >= h && aux.number_of_ratings < movies[j - h].number_of_ratings)
-            {
-                movies[j] = movies[j - h];
-                j = j - h;
-            }
-            movies[j] = aux;
-            i = i + 1;
-        }
-        k++;
-        h = tam / pow(2, k);
-    }
-    return movies;
-}
-
+//Cria lista de filmes encontrados na árvore trie
 void create_list_of_found_movies(TrieMovie *root, int found_movies_list[])
 {
     int index;
     if (root->isEndOfWord)
     {
-        found_movies_list[global_counter] = root->movieId;
-        global_counter++;
+        found_movies_list[globalCounter] = root->movieId;
+        globalCounter++;
     }
     for (int i = 0; i < ALPHABET_SIZE; i++)
     {
@@ -193,56 +165,54 @@ void create_list_of_found_movies(TrieMovie *root, int found_movies_list[])
     }
 }
 
+//Pesquisa fillmes em uma arvore trie por prefixo
 vector<Movie> search_movies_to_prefix(TrieMovie *root, Movie hash_movies[], string prefix)
 {
     int key;
-    vector<Movie> found_movies_list;
-    TrieMovie *found_movies = search_prefix(root, prefix);
+    vector<Movie> foundMoviesList;
+    TrieMovie *foundMovies = search_prefix(root, prefix);
 
-    if (found_movies == NULL && !found_movies->isEndOfWord)
+    if (foundMovies == NULL)
     {
-        return found_movies_list;
+        return foundMoviesList;
     }
 
-    int num_of_movies_found = size_of_trie(found_movies);
-    int found_movies_id_list[num_of_movies_found];
-    create_list_of_found_movies(found_movies, found_movies_id_list);
+    int numOfMoviesFound = size_of_trie(foundMovies);
+    int foundMoviesIdList[numOfMoviesFound];
+    create_list_of_found_movies(foundMovies, foundMoviesIdList);
 
-    for (int i = 0; i < num_of_movies_found; i++)
+    for (int i = 0; i < numOfMoviesFound; i++)
     {
-        key = search_movie_in_hash(hash_movies, found_movies_id_list[i]);
-        found_movies_list.push_back(hash_movies[key]);
+        key = search_movie_in_hash(hash_movies, foundMoviesIdList[i]);
+        foundMoviesList.push_back(hash_movies[key]);
     }
-    return found_movies_list;
+    globalCounter = 0;
+    return foundMoviesList;
 }
 
-void print_movies_to_prefix(TrieMovie *root, Movie hash_movies[], string prefix)
+//Imprime filmes a partir de um dado prefixo
+void print_movies_by_prefix(TrieMovie *root, Movie hashMovies[], string prefix)
 {
-    vector<Movie> found_movies = search_movies_to_prefix(root, hash_movies, prefix);
-
-    if (found_movies.empty())
+    vector<Movie> foundMovies = search_movies_to_prefix(root, hashMovies, prefix);
+    
+    if (foundMovies.empty())
     {
         cout << "Movies not found!";
     }
     else
     {
-        found_movies = sort_movies_list_by_count(found_movies);
-        cout << "Movie Id | "
-             << "Title | "
-             << "Genres | "
-             << "Rating | "
-             << "Count | " << endl;
-        for (vector<Movie>::iterator it = found_movies.end() - 1; it != found_movies.begin() - 1; it--)
+        foundMovies = sort_movies_list_by_rating(foundMovies);
+        for (vector<Movie>::iterator it = foundMovies.end() - 1; it != foundMovies.begin() - 1; it--)
         {
-            cout << it->id << " | "
-                 << it->title << " | ";
+            cout << "Movie Id: " << it->id
+                 << " | Title: " << it->title
+                 << " | Genres: ";
             for (vector<string>::iterator it_2 = it->genres.begin(); it_2 != it->genres.end(); it_2++)
             {
                 cout << *it_2 << ",";
             }
-            cout << " | " << it->ratings_average << " | "
-                 << it->number_of_ratings << endl
-                 << endl;
+            cout << " | Rating: " << it->ratingsAverage
+                 << " | Count: " << it->numberOfRatings << endl;
         }
     }
 }
@@ -262,16 +232,16 @@ bool find_genre(Movie movie, string genre)
 
 //Função que retorna um vetor com todos filmes que sejam de um dado genero
 //que tenham no minimo 1000 avaliações
-vector<Movie> search_movie_to_genre(Movie hash_movies[], string genre)
+vector<Movie> search_movie_to_genre(Movie hashMovies[], string genre)
 {
     vector<Movie> movies;
-    for (int i = 0; i < hash_movies_size; i++)
+    for (int i = 0; i < HASH_MOVIES_SIZE; i++)
     {
-        if (hash_movies[i].occupied)
+        if (hashMovies[i].occupied)
         {
-            if (find_genre(hash_movies[i], genre) && hash_movies[i].number_of_ratings >= 1000)
+            if (find_genre(hashMovies[i], genre) && hashMovies[i].numberOfRatings >= 1000)
             {
-                movies.push_back(hash_movies[i]);
+                movies.push_back(hashMovies[i]);
             }
         }
     }
@@ -280,37 +250,42 @@ vector<Movie> search_movie_to_genre(Movie hash_movies[], string genre)
 
 //Função que imprime o top n filmes com melhores notas que sejam do genero especificado e
 //tenham no minimo 1000 avaliações
-void print_top_n_genre(Movie hash_movies[], int top_n, string genre)
+void print_top_n_genre(Movie hashMovies[], int topN, string genre)
 {
-    vector<Movie> found_movies = search_movie_to_genre(hash_movies, genre);
-    if (found_movies.empty())
+    vector<Movie> foundMovies = search_movie_to_genre(hashMovies, genre);
+    if (foundMovies.empty())
     {
         cout << "Movies with " << genre << " genre and more then 1000 ratings not found!";
     }
     else
     {
-        found_movies = sort_movies_list_by_rating(found_movies);
-        for (int i = found_movies.size() - 1; i > found_movies.size() - 1 - top_n; i--)
+        foundMovies = sort_movies_list_by_rating(foundMovies);
+        for (int i = foundMovies.size() - 1; i > foundMovies.size() - 1 - topN; i--)
         {
-            cout << found_movies[i].title << " | ";
-            for (int j = 0; j < found_movies[i].genres.size(); j++)
+            cout << "Title: " << foundMovies[i].title
+                 << "Genres: "
+                 << " | ";
+            for (int j = 0; j < foundMovies[i].genres.size(); j++)
             {
-                cout << found_movies[i].genres[j] << ", ";
+                cout << foundMovies[i].genres[j] << ", ";
             }
-            cout << " | " << found_movies[i].ratings_average
-                 << " | " << found_movies[i].number_of_ratings << endl;
+            cout << " | "
+                 << "Rating: " << foundMovies[i].ratingsAverage
+                 << " | "
+                 << "Count: " << foundMovies[i].numberOfRatings << endl;
         }
     }
 }
 
+//Imprime um filme dado filme
 void print_movie(Movie movie)
 {
-    cout << movie.title << " | ";
+    cout << "Title: " << movie.title << " | Genres: ";
     for (int i = 0; i < movie.genres.size(); i++)
     {
         cout << movie.genres[i] << ", ";
     }
-    cout << " | " << movie.ratings_average
-         << " | " << movie.number_of_ratings
+    cout << " | Rating: " << movie.ratingsAverage
+         << " | Count: " << movie.numberOfRatings
          << endl;
 }

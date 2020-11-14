@@ -1,26 +1,11 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <bits/stdc++.h>
-
 using namespace std;
 
-// struct rating
-// {
-//     int userId;
-//     int movieId;
-//     float rating;
-//     //string timesTamp;
-// };
-// typedef struct rating Rating;
-
-void read_ratings(Movie hash_movies[], User hash_users[])
+//Monta hash de usuários e filmes a partir de csv de avaliações
+void read_ratings(Movie hashMovies[], User hashUsers[])
 {
-    int key, key_user, movieId, userId;
+    int key, keyUser, movieId, userId;
     float rating;
     fstream fin;
-    //vector<Rating> ratings;
-    // Rating rating;
     string line;
     string delimiter = ",";
     size_t pos = 0;
@@ -43,29 +28,28 @@ void read_ratings(Movie hash_movies[], User hash_users[])
         rating = stof(line.substr(0, pos));
         line.erase(0, pos + delimiter.length());
 
-        key = search_movie_in_hash(hash_movies, movieId);
+        key = search_movie_in_hash(hashMovies, movieId);
         if (key > 0)
         {
-            hash_movies[key].number_of_ratings++;
-            hash_movies[key].ratings_average =
-                (hash_movies[key].ratings_average * (hash_movies[key].number_of_ratings - 1) + rating) / hash_movies[key].number_of_ratings;
+            hashMovies[key].numberOfRatings++;
+            hashMovies[key].ratingsAverage =
+                (hashMovies[key].ratingsAverage * (hashMovies[key].numberOfRatings - 1) + rating) / hashMovies[key].numberOfRatings;
         }
 
-        key_user = search_user_in_hash(hash_users, userId);
-        if (key_user > 0)
+        keyUser = search_user_in_hash(hashUsers, userId);
+        if (keyUser > 0)
         {
-            hash_users[key_user].ratings.push_back(rating);
-            hash_users[key_user].ratedMoviesId.push_back(movieId);
+            hashUsers[keyUser].ratings.push_back(rating);
+            hashUsers[keyUser].ratedMoviesId.push_back(movieId);
         }
         else
         {
             user.id = userId;
             user.ratedMoviesId.push_back(movieId);
             user.ratings.push_back(rating);
-            insert_user_to_hash(hash_users, user);
+            insert_user_to_hash(hashUsers, user);
         }
         user.ratings.clear();
         user.ratedMoviesId.clear();
-        //ratings.push_back(rating);
     }
 }

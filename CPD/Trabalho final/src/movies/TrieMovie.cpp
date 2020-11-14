@@ -1,8 +1,3 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <bits/stdc++.h>
-
 using namespace std;
 
 const int ALPHABET_SIZE = 128;
@@ -16,8 +11,8 @@ struct TrieMovie
 };
 typedef struct TrieMovie TrieMovie;
 
-// Returns new trie node (initialized to NULLs)
-TrieMovie *initializeMovie(void)
+//Retorna um novo nodo da trie (inicializa os NULL's)
+TrieMovie *initialize_movie(void)
 {
     TrieMovie *movie = new TrieMovie;
 
@@ -29,9 +24,7 @@ TrieMovie *initializeMovie(void)
     return movie;
 }
 
-// If not present, inserts key into trie
-// If the key is prefix of trie node, just
-// marks leaf node
+//Insere um novo filme na árvore trie
 void insert_movie(TrieMovie *root, string key, int movieId)
 {
     TrieMovie *pCrawl = root;
@@ -47,17 +40,18 @@ void insert_movie(TrieMovie *root, string key, int movieId)
             index = key[i];
         }
         if (!pCrawl->children[index])
-            pCrawl->children[index] = initializeMovie();
+            pCrawl->children[index] = initialize_movie();
 
         pCrawl = pCrawl->children[index];
     }
 
-    // mark last node as leaf
+    //Marca o ultimo nodo como folha
     pCrawl->isEndOfWord = true;
     pCrawl->title = key;
     pCrawl->movieId = movieId;
 }
 
+//Verifica se uma dada árvore trie é vazia
 bool is_trie_empty(TrieMovie *trie)
 {
     for (int i = 0; i < ALPHABET_SIZE; i++)
@@ -70,6 +64,7 @@ bool is_trie_empty(TrieMovie *trie)
     return true;
 }
 
+//Retorna o tamanho da trie
 int size_of_trie(TrieMovie *trie)
 {
     int counter = 0;
@@ -80,18 +75,13 @@ int size_of_trie(TrieMovie *trie)
     {
         if (trie->children[i] != NULL)
         {
-            // if(trie->children[i]->isEndOfWord){
-            //     counter++;
-            // }
             counter = counter + size_of_trie(trie->children[i]);
         }
     }
     return counter;
 }
 
-
-// Returns true if key presents in trie, else
-// false
+//Retorna true se a chave está presente, senão retorna false
 bool search(struct TrieMovie *root, string key)
 {
     TrieMovie *pCrawl = root;
@@ -107,17 +97,16 @@ bool search(struct TrieMovie *root, string key)
         {
             index = key[i];
         }
-        // int index = tolower(key[i]) - 'a';
         if (!pCrawl->children[index])
         {
             return false;
         }
         pCrawl = pCrawl->children[index];
     }
-
     return (pCrawl != NULL && pCrawl->isEndOfWord);
 }
 
+//Pesquisa na trie um filme a partir de um prefixo
 TrieMovie *search_prefix(struct TrieMovie *root, string prefix)
 {
     TrieMovie *pCrawl = root;
@@ -133,137 +122,54 @@ TrieMovie *search_prefix(struct TrieMovie *root, string prefix)
         {
             index = prefix[i];
         }
-        // int index = tolower(key[i]) - 'a';
         if (!pCrawl->children[index])
         {
             return NULL;
         }
-
         pCrawl = pCrawl->children[index];
     }
-    // return (pCrawl != NULL && !is_trie_empty(pCrawl));
     return pCrawl;
 }
 
-void print_trie_movies(TrieMovie *root, string word = "")
-{
-    string word_temp;
-    int index;
-
-    if (root->isEndOfWord)
-    {
-        cout << root->title << endl;
-    }
-    for (int i = 0; i < ALPHABET_SIZE; i++)
-    {
-        word_temp = word;
-        if (root->children[i] != NULL)
-        {
-            if (i >= 65 && i <= 90)
-            {
-                index = i + 32;
-            }
-            else
-            {
-                index = i;
-            }
-            // int index = i + 'a';
-            word_temp.push_back(index);
-            print_trie_movies(root->children[i], word_temp);
-        }
-    }
-}
-
-void print_trie_movies_for_prefix(TrieMovie *root, string word)
-{
-    TrieMovie *trie_with_prefix = search_prefix(root, word);
-    if (trie_with_prefix != NULL)
-    {
-        print_trie_movies(trie_with_prefix, word);
-    }
-    else
-    {
-        cout << "Not found" << endl;
-    }
-}
-
-
-// void read_movies()
+// //Imprime filmes a partir de um dado prefixo
+// void print_trie_movies(TrieMovie *root, string word = "")
 // {
-//     fstream fin;
-//     vector<Movie> movies;
-//     Movie movie;
-//     string line, token;
-//     int i;
-//     string delimiter = "|";
-//     size_t pos;
+//     string word_temp;
+//     int index;
 
-//     fin.open("../Dados_clean/movie_clean.csv", ios::in);
-//     getline(fin, line);
-    
-//     while (getline(fin, line))
+//     if (root->isEndOfWord)
 //     {
-//         i = 0;
-//         while (i < line.length())
-//         {
-//             if (line[i] == ',')
-//             {
-//                 line[i] = '|';
-//                 i = line.length();
-//             }
-//             i++;
-//         }
-
-//         i = line.length() - 1;
-//         while (i > 0)
-//         {
-//             if (line[i] == ',')
-//             {
-//                 line[i] = '|';
-//                 i = 0;
-//             }
-//             i--;
-//         }
-
-//         //Store movie id
-//         pos = 0;
-//         pos = line.find(delimiter);
-//         token = line.substr(0, pos);
-//         movie.id = stoi(token, 0);
-//         line.erase(0, pos + delimiter.length());
-
-//         //Store movie title
-//         pos = line.find(delimiter);
-//         token = line.substr(0, pos);
-//         if (token[0] == '"'){
-//             token.erase(0,1);
-//             token.pop_back();
-//         }
-//         movie.title = token;
-//         line.erase(0, pos + delimiter.length());
-
-//         //Store list of genres
-//         pos = line.find(delimiter);
-//         do
-//         {
-//             token = line.substr(0, pos);
-//             movie.genres.push_back(token);
-//             line.erase(0, pos + delimiter.length());
-//         } while ((pos = line.find(delimiter)) != std::string::npos);
-
-//         movies.push_back(movie);
-//         movie.genres.clear();
+//         cout << root->title << endl;
 //     }
-    
-//     //Usado pra imprimir 
-//     // for (vector<Movie>::iterator it = movies.begin(); it != movies.end(); it++)
-//     // {
-//     //     // cout << *it << "\n"; // valor na posição apontada por it
-//     //     cout << "Id: " << it->id << " Movie: " << it->title << " Genres: ";
-//     //     for (vector<string>::iterator it_2 = it->genres.begin(); it_2 != it->genres.end(); it_2++)
-//     //     {
-//     //         cout << *it_2 << ", ";
-//     //     }
-//     //     cout << "\n";
-//     // }
+//     for (int i = 0; i < ALPHABET_SIZE; i++)
+//     {
+//         word_temp = word;
+//         if (root->children[i] != NULL)
+//         {
+//             if (i >= 65 && i <= 90)
+//             {
+//                 index = i + 32;
+//             }
+//             else
+//             {
+//                 index = i;
+//             }
+//             // int index = i + 'a';
+//             word_temp.push_back(index);
+//             print_trie_movies(root->children[i], word_temp);
+//         }
+//     }
+// }
+
+// void print_trie_movies_for_prefix(TrieMovie *root, string word)
+// {
+//     TrieMovie *trie_with_prefix = search_prefix(root, word);
+//     if (trie_with_prefix != NULL)
+//     {
+//         print_trie_movies(trie_with_prefix, word);
+//     }
+//     else
+//     {
+//         cout << "Not found" << endl;
+//     }
 // }

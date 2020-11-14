@@ -1,35 +1,17 @@
+#include <cstdio>
+#include <cstdlib>
+#include <string>
+#include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <math.h>
+#include <limits.h>
 #include <vector>
 #include <bits/stdc++.h>
 
 using namespace std;
 
-// void read_record()
-// {
-
-// 	// File pointer
-// 	fstream fin;
-
-// 	// Open an existing file
-// 	fin.open("../Dados_clean/minirating.csv", ios::in);
-
-// 	// Read the Data from the file
-// 	// as String Vector
-// 	vector<string> rows;
-// 	string line, temp;
-// 	fin >> line;
-// 	while (fin >> line)
-// 	{
-// 		fin >> temp;
-// 		line = line + " " + temp;
-// 		rows.push_back(line);		
-// 	}
-// 	// for (vector<string>::iterator it = rows.begin(); it != rows.end(); it++)
-// 	// {
-// 	// 	cout << *it << "\n"; // valor na posição apontada por it
-// 	// }
-// }
+//Função que deixar a string toda com letras minusculas
 string to_lower(string string)
 {
     for (int i = 0; i < string.length(); i++)
@@ -37,4 +19,23 @@ string to_lower(string string)
         string[i] = tolower(string[i]);
     }
     return string;
+}
+
+//Função que verifica se usuario deseja continuar realizando pesquisas
+bool stop_program()
+{
+    string willContinue;
+    do
+    {
+        cout << endl << "Deseja continuar? [s/n] \n";
+        cin >> willContinue;
+    } while (to_lower(willContinue) != "s" && to_lower(willContinue) != "n");
+    if (to_lower(willContinue) == "n")
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }

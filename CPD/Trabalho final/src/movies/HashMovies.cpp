@@ -1,45 +1,34 @@
-#include <cstdio>
-#include <cstdlib>
-#include <string>
-#include <algorithm>
-#include <iostream>
-#include <fstream>
-#include <math.h>
-#include <limits.h>
-#include <vector>
-#include <bits/stdc++.h>
-
 using namespace std;
 
-const int hash_movies_size = 60011; //tamanho da tabela sendo um númerdo primo (recomendado para duplo hash)
-const int divider_movies = 30011;   //menor número primo maior que o tamanho da tabela
+const int HASH_MOVIES_SIZE = 60011;
+const int DIVIDER_MOVIES = 30011;   
 
 struct Movie
 {
     int id;
     string title;
     vector<string> genres;
-    float ratings_average = 0;
-    int number_of_ratings = 0;
+    float ratingsAverage = 0;
+    int numberOfRatings = 0;
     bool used = false;
     bool occupied = false;
 };
 typedef struct Movie Movie;
 
-//funções de hash escolhidas - divisão e polinomial
+//funções de hash escolhidas - divisão
 int division_method(int key)
 {
-    int key_number = key % divider_movies;
-    return key_number;
+    int keyNumber = key % DIVIDER_MOVIES;
+    return keyNumber;
 }
 
-//cria tabela de hash usando o metodo da divisão e resolve conflitos com duplo hash. Retorna número de colisões
+//cria tabela de hash usando o metodo da divisão e resolve conflitos com duplo hash
 void insert_movie_to_hash(Movie hash[], Movie movie)
 {
-    int key, key_aux;
+    int key, keyAux;
     int i = 1;
     bool inserted = false;
-    string name_read, name_read_aux;
+    string nameRead, nameReadAux;
 
     key = division_method(movie.id);
     while (!inserted)
@@ -48,9 +37,9 @@ void insert_movie_to_hash(Movie hash[], Movie movie)
         {
             key = key + i * division_method(movie.id) + i;
             i++;
-            while (key >= hash_movies_size)
+            while (key >= HASH_MOVIES_SIZE)
             {
-                key = key - hash_movies_size;
+                key = key - HASH_MOVIES_SIZE;
             }
         }
         else
@@ -63,7 +52,7 @@ void insert_movie_to_hash(Movie hash[], Movie movie)
     }
 }
 
-//pesquisa na tabela de hash criada usando metodo da divisao com resolução de conflitos com duplo hash
+//pesquisa na tabela hash de filmes criada usando metodo da divisao com resolução de conflitos com duplo hash
 int search_movie_in_hash(Movie hash[], int movieId)
 {
     int i = 1;
@@ -78,53 +67,11 @@ int search_movie_in_hash(Movie hash[], int movieId)
         {
             key = key + i * division_method(movieId) + i;
             i++;
-            // if (key >= hash_size)
-            // {
-            //     key = key - hash_size;
-            // }
-            while (key >= hash_movies_size)
+            while (key >= HASH_MOVIES_SIZE)
             {
-                key = key - hash_movies_size;
+                key = key - HASH_MOVIES_SIZE;
             }
         }
     }
     return -1;
 }
-
-void print_movies_hash(Movie hash[], int table_size)
-{
-    int j = 0;
-    for (int i = 0; i < table_size; i++)
-    {
-        if (hash[i].occupied)
-        {
-            cout << "Movie Id: " << hash[i].id
-                 << " | Title: " << hash[i].title
-                 << " | Movie Genres: ";
-            for (vector<string>::iterator it = hash[i].genres.begin(); it != hash[i].genres.end(); it++)
-            {
-                cout << *it << ", ";
-            }
-            cout << " | Rating: " << hash[i].ratings_average
-                 << " | Count: " << hash[i].number_of_ratings;
-            cout << endl;
-            j++;
-        }
-    }
-    cout << "Number of keys: " << j << "\n";
-}
-
-// int main(int argc, char const *argv[])
-// {
-//     Movie input_linear[table_size_linear];
-//     Movie input_double_hash[table_size_double_hash];
-
-//     //Cria tabela hash com metodo da divisão e resolve conflitos com duplo hash
-//     cout << create_division_double_hash(input_double_hash, file_name);
-//     cout << "\n"
-//          << search_division_double_hash(input_double_hash, "Madoc Kolson");
-//     cout << "\n"
-//          << return_occupancy_rate(input_double_hash, table_size_double_hash);
-
-//     return 0;
-// }
