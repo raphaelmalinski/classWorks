@@ -31,6 +31,11 @@ int isRunning(void) {
 
 [;()\[\]{}=+-*/<>&|~] { return yytext[0]; }
 
+"<=" { return OPERATOR_LE; }
+">=" { return OPERATOR_GE; }
+"==" { return OPERATOR_EQ; }
+"!=" { return OPERATOR_DIF; }
+
 [0-7]+ 		{ return LIT_OCTAL; }
 [a-zA-Z]+ 		{ hashInsert(0, yytext); return TK_ID; }
 
