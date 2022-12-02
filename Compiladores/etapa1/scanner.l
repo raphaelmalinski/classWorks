@@ -36,8 +36,10 @@ int isRunning(void) {
 "==" { return OPERATOR_EQ; }
 "!=" { return OPERATOR_DIF; }
 
+[a-z_.][a-z0-9_.]+	{ hashInsert(0, yytext); return TK_IDENTIFIER; }
+[0-9][a-z0-9_.]+	{ return TOKEN_ERROR; }
+
 [0-7]+ 		{ return LIT_OCTAL; }
-[a-zA-Z]+ 		{ hashInsert(0, yytext); return TK_ID; }
 
 [ \t]
 "\n" 		{ ++lineNumber; }
