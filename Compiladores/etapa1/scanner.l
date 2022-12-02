@@ -10,12 +10,6 @@ int isRunning(void) {
   return running;
 }
 
-#define KW_INT 1
-#define KW_FOR 2
-#define LIT_OCTAL 3
-#define TK_ID 4
-#define TK_ERROR 6
-
 #include "hash.c"
 
 %}
@@ -24,8 +18,17 @@ int isRunning(void) {
 
 %%
 
-"int"  		{ return KW_INT; }
-"for"  		{ return KW_FOR; }
+"cara"  	 { return KW_CARA; }
+"inte"  	 { return KW_INTE; }
+"real"  	 { return KW_REAL; }
+"se"  		 { return KW_SE; }
+"entaum"   { return KW_ENTAUM; }
+"senaum"   { return KW_SENAUM; }
+"enquanto" { return KW_ENQUANTO; }
+"entrada"  { return KW_ENTRADA; }
+"escreva"  { return KW_ESCREVA; }
+"retorne"  { return KW_RETORNE; }
+
 [0-7]+ 		{ return LIT_OCTAL; }
 [a-zA-Z]+ 		{ hashInsert(0, yytext); return TK_ID; }
 [-;()=\[\]{}+*/] { return yytext[0]; }
