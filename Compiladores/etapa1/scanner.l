@@ -2,6 +2,14 @@
 int lineNumber = 1;
 int running = 1;
 
+int getLineNumber(void) {
+  return lineNumber;
+}
+
+int isRunning(void) {
+  return running;
+}
+
 #define KW_INT 1
 #define KW_FOR 2
 #define LIT_OCTAL 3

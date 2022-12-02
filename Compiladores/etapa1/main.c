@@ -12,10 +12,10 @@ int main(int argc, char** argv) {
   // }
   hashInit();
   
-  while(running) {
+  while(isRunning()) {
     tok = yylex();
 
-    if (!running)
+    if (!isRunning())
       break;
     
     switch(tok) {
@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
       default: { printf("Symbol %d(%c) ", tok, tok); } break;
     }
   }
-  printf("File had %d lines\n", lineNumber);
+  printf("File had %d lines\n", getLineNumber());
   hashPrint();
   exit(0);
 }

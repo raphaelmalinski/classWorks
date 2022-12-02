@@ -2,8 +2,12 @@ int a = 10;
 
 ///
 comentario de varias linhas
+int j = 5;
 \\\
 
+//int j = 4;
+
+%
 int testeee = 15;
 int I = 15;
 testeee = 15;
