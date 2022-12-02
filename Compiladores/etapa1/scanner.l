@@ -29,9 +29,11 @@ int isRunning(void) {
 "escreva"  { return KW_ESCREVA; }
 "retorne"  { return KW_RETORNE; }
 
+[;()\[\]{}=+-*/<>&|~] { return yytext[0]; }
+
 [0-7]+ 		{ return LIT_OCTAL; }
 [a-zA-Z]+ 		{ hashInsert(0, yytext); return TK_ID; }
-[-;()=\[\]{}+*/] { return yytext[0]; }
+
 [ \t]
 "\n" 		{ ++lineNumber; }
 "///" 		{ BEGIN(COMMENT); }
