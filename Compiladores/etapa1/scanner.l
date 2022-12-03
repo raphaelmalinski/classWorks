@@ -15,6 +15,7 @@ int isRunning(void) {
 %}
 
 %x COMMENT
+%x STRING
 
 %%
 
@@ -40,23 +41,33 @@ int isRunning(void) {
 
 [0-9]+           { return LIT_INTEIRO; }
 [0-9]+"."[0-9]+] { return LIT_FLOAT; }
-['].[']          { return LIT_CHAR; }
 [']"\n"[']       { return LIT_CHAR; }
+[']"\\n"[']      { return LIT_CHAR; }
 [']"\t"[']       { return LIT_CHAR; }
-["].+["]      	 { return LIT_STRING; }
+[']"\\t"[']      { return LIT_CHAR; }
+['].[']          { return LIT_CHAR; }
+["].+["]      	 { BEGIN(STRING); }
 
-[0-9][a-z0-9_.]+	  { return TOKEN_ERROR; }
+[0-9][a-z0-9_.]+ { return TOKEN_ERROR; }
 
-[ \t;,]
+[ \t,]
+
 "\n" 		{ ++lineNumber; }
-"///" 		{ BEGIN(COMMENT); }
+
+"///" 	{ BEGIN(COMMENT); }
 "//".*
-. 		{ return TK_ERROR; }
+
+. 		  { return TK_ERROR; }
 
 <COMMENT>"\n"     { ++lineNumber; }
 <COMMENT>.
 <COMMENT>"\\\\\\" { BEGIN(INITIAL); }
 
+<STRING>"\n"     { ++lineNumber; }
+<STRING>"\\n"
+<STRING>"\\\""
+<STRING>["] { return LIT_STRING; BEGIN(INITIAL); }
+<STRING>.
 %%
 
 #include "main.c"
