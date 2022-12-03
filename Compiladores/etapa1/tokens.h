@@ -14,7 +14,7 @@
 #define KW_REAL           258
 
 #define KW_SE             261
-#define KW_ENTAUM         261
+#define KW_ENTAUM         262
 #define KW_SENAUM         263
 #define KW_ENQUANTO       264
 #define KW_ENTRADA        266
