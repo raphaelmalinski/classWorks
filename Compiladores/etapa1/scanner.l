@@ -2,7 +2,7 @@
   #include "tokens.h"
   #define HASH_SIZE 997
 
-  int lineNumber = 0;
+  int lineNumber = 1;
   int running = 1;
 
   typedef struct hash_node {
@@ -119,12 +119,12 @@
 
 [a-z_.][a-z0-9_.]*	{ hashInsert(0, yytext); return TK_IDENTIFIER; }
 
-[0-9]+             { return LIT_INTEIRO; }
-[0-9]+"."[0-9]+    { return LIT_FLOAT; }
-[']"\\n"[']        { return LIT_CHAR; }
-[']"\\t"[']        { return LIT_CHAR; }
-['].[']            { return LIT_CHAR; }
-\"([^\\\"]|\\.)*\" { return LIT_STRING; }
+[0-9]+             { hashInsert(0, yytext); return LIT_INTEIRO; }
+[0-9]+"."[0-9]+    { hashInsert(0, yytext); return LIT_FLOAT; }
+[']"\\n"[']        { hashInsert(0, yytext); return LIT_CHAR; }
+[']"\\t"[']        { hashInsert(0, yytext); return LIT_CHAR; }
+['].[']            { hashInsert(0, yytext); return LIT_CHAR; }
+\"([^\\\"]|\\.)*\" { hashInsert(0, yytext); return LIT_STRING; }
 
 
 [0-9][a-z0-9_.]+ { return TOKEN_ERROR; }
