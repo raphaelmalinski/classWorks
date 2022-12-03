@@ -37,11 +37,17 @@ int isRunning(void) {
 "!=" { return OPERATOR_DIF; }
 
 [a-z_.][a-z0-9_.]+	{ hashInsert(0, yytext); return TK_IDENTIFIER; }
-[0-9][a-z0-9_.]+	{ return TOKEN_ERROR; }
 
-[0-7]+ 		{ return LIT_OCTAL; }
+[0-9]+           { return LIT_INTEIRO; }
+[0-9]+"."[0-9]+] { return LIT_FLOAT; }
+['].[']          { return LIT_CHAR; }
+[']"\n"[']       { return LIT_CHAR; }
+[']"\t"[']       { return LIT_CHAR; }
+["].+["]      	 { return LIT_STRING; }
 
-[ \t]
+[0-9][a-z0-9_.]+	  { return TOKEN_ERROR; }
+
+[ \t;,]
 "\n" 		{ ++lineNumber; }
 "///" 		{ BEGIN(COMMENT); }
 "//".*
