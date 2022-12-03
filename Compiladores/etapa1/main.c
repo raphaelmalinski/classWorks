@@ -29,9 +29,21 @@ int main(int argc, char** argv) {
       case KW_ENTRADA:  { printf("KW ENTRADA "); } break;
       case KW_ESCREVA:  { printf("KW ESCREVA "); } break;
       case KW_RETORNE:  { printf("KW RETORNE "); } break;
-      // case LIT_OCTAL: { printf("LITERAL OCTAL (%s) ", yytext); } break;
-      // case TK_ID: { printf("Nome (%s) ", yytext); } break;
-      // case TK_ERROR: { printf("LEX ERROR "); } break;
+
+      case OPERATOR_LE: { printf("Symbol %d(<=) ", tok); } break;
+      case OPERATOR_GE: { printf("Symbol %d(>=) ", tok); } break;
+      case OPERATOR_EQ: { printf("Symbol %d(==) ", tok); } break;
+      case OPERATOR_DIF: { printf("Symbol %d(!=) ", tok); } break;
+
+      case TK_IDENTIFIER: { printf("Nome (%s) ", yytext); } break;
+
+      case LIT_INTEIRO: { printf("LITERAL INTEIRO (%s) ", yytext); } break;
+      case LIT_FLOAT:   { printf("LITERAL FLOAT (%s) ", yytext); } break;
+      case LIT_CHAR:    { printf("LITERAL CHAR (%s) ", yytext); } break;
+      case LIT_STRING:  { printf("LITERAL STRING (%s) ", yytext); } break;
+      
+      case TOKEN_ERROR: { printf("LEX ERROR "); } break;
+      
       default: { printf("Symbol %d(%c) ", tok, tok); } break;
     }
   }
