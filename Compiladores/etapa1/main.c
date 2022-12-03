@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
   //  fprintf(stderr, "Cannot open file %s\n", argv[1]);
   //  exit(2);
   // }
-  hashInit();
+  initMe();
   
   while(isRunning()) {
     tok = yylex();
@@ -19,11 +19,19 @@ int main(int argc, char** argv) {
       break;
     
     switch(tok) {
-      case KW_INT: { printf("KW INT "); } break;
-      case KW_FOR: { printf("KW FOR "); } break;
-      case LIT_OCTAL: { printf("LITERAL OCTAL (%s) ", yytext); } break;
-      case TK_ID: { printf("Nome (%s) ", yytext); } break;
-      case TK_ERROR: { printf("LEX ERROR "); } break;
+      case KW_CARA:     { printf("KW CARA "); } break;
+      case KW_INTE:     { printf("KW INTE "); } break;
+      case KW_REAL:     { printf("KW REAL "); } break;
+      case KW_SE:       { printf("KW SE "); } break;
+      case KW_ENTAUM:   { printf("KW ENTAUM "); } break;
+      case KW_SENAUM:   { printf("KW SENAUM "); } break;
+      case KW_ENQUANTO: { printf("KW ENQUANTO "); } break;
+      case KW_ENTRADA:  { printf("KW ENTRADA "); } break;
+      case KW_ESCREVA:  { printf("KW ESCREVA "); } break;
+      case KW_RETORNE:  { printf("KW RETORNE "); } break;
+      // case LIT_OCTAL: { printf("LITERAL OCTAL (%s) ", yytext); } break;
+      // case TK_ID: { printf("Nome (%s) ", yytext); } break;
+      // case TK_ERROR: { printf("LEX ERROR "); } break;
       default: { printf("Symbol %d(%c) ", tok, tok); } break;
     }
   }
