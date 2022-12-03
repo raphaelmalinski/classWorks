@@ -96,7 +96,6 @@
 %}
 
 %x COMMENT
-%x STRING
 
 %%
 
@@ -118,16 +117,15 @@
 "==" { return OPERATOR_EQ; }
 "!=" { return OPERATOR_DIF; }
 
-[a-z_.][a-z0-9_.]+	{ hashInsert(0, yytext); return TK_IDENTIFIER; }
+[a-z_.][a-z0-9_.]*	{ hashInsert(0, yytext); return TK_IDENTIFIER; }
 
-[0-9]+           { return LIT_INTEIRO; }
-[0-9]+"."[0-9]+] { return LIT_FLOAT; }
-[']"\n"[']       { return LIT_CHAR; }
-[']"\\n"[']      { return LIT_CHAR; }
-[']"\t"[']       { return LIT_CHAR; }
-[']"\\t"[']      { return LIT_CHAR; }
-['].[']          { return LIT_CHAR; }
-["].+["]      	 { BEGIN(STRING); }
+[0-9]+             { return LIT_INTEIRO; }
+[0-9]+"."[0-9]+    { return LIT_FLOAT; }
+[']"\\n"[']        { return LIT_CHAR; }
+[']"\\t"[']        { return LIT_CHAR; }
+['].[']            { return LIT_CHAR; }
+\"([^\\\"]|\\.)*\" { return LIT_STRING; }
+
 
 [0-9][a-z0-9_.]+ { return TOKEN_ERROR; }
 
@@ -144,11 +142,6 @@
 <COMMENT>.
 <COMMENT>"\\\\\\" { BEGIN(INITIAL); }
 
-<STRING>"\n"     { ++lineNumber; }
-<STRING>"\\n"
-<STRING>"\\\""
-<STRING>["] { return LIT_STRING; BEGIN(INITIAL); }
-<STRING>.
 %%
 
 #include "main.c"
