@@ -117,14 +117,14 @@
 "==" { return OPERATOR_EQ; }
 "!=" { return OPERATOR_DIF; }
 
-[a-z_.][a-z0-9_.]*	{ hashInsert(0, yytext); return TK_IDENTIFIER; }
+[a-z_.][a-z0-9_.]*	{ hashInsert(TK_IDENTIFIER, yytext); return TK_IDENTIFIER; }
 
-[0-9]+             { hashInsert(0, yytext); return LIT_INTEIRO; }
-[0-9]+"."[0-9]+    { hashInsert(0, yytext); return LIT_FLOAT; }
-[']"\\n"[']        { hashInsert(0, yytext); return LIT_CHAR; }
-[']"\\t"[']        { hashInsert(0, yytext); return LIT_CHAR; }
-['].[']            { hashInsert(0, yytext); return LIT_CHAR; }
-\"([^\\\"]|\\.)*\" { hashInsert(0, yytext); return LIT_STRING; }
+[0-9]+             { hashInsert(LIT_INTEIRO, yytext); return LIT_INTEIRO; }
+[0-9]+"."[0-9]+    { hashInsert(LIT_FLOAT, yytext); return LIT_FLOAT; }
+[']"\\n"[']        { hashInsert(LIT_CHAR, yytext); return LIT_CHAR; }
+[']"\\t"[']        { hashInsert(LIT_CHAR, yytext); return LIT_CHAR; }
+['].[']            { hashInsert(LIT_CHAR, yytext); return LIT_CHAR; }
+\"([^\\\"]|\\.)*\" { hashInsert(LIT_STRING, yytext); return LIT_STRING; }
 
 
 [0-9][a-z0-9_.]+ { return TOKEN_ERROR; }
