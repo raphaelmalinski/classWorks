@@ -126,9 +126,6 @@
 ['].[']            { hashInsert(LIT_CHAR, yytext); return LIT_CHAR; }
 \"([^\\\"]|\\.)*\" { hashInsert(LIT_STRING, yytext); return LIT_STRING; }
 
-
-[0-9][a-z0-9_.]+ { return TOKEN_ERROR; }
-
 [ \t,]
 
 "\n" 		{ ++lineNumber; }
