@@ -1,4 +1,12 @@
 %{
+  #include "hash.h"
+%}
+
+%union {
+  HASH *symbol;
+}
+
+%{
   int yylex();
   void yyerror();
 %}
@@ -20,12 +28,12 @@
 %token OPERATOR_EQ
 %token OPERATOR_DIF
 
-%token TK_IDENTIFIER
+%token<symbol> TK_IDENTIFIER
 
-%token LIT_INTEIRO
-%token LIT_FLOAT
-%token LIT_CHAR
-%token LIT_STRING
+%token<symbol> LIT_INTEIRO
+%token<symbol> LIT_FLOAT
+%token<symbol> LIT_CHAR
+%token<symbol> LIT_STRING
 
 %token TOKEN_ERROR
 
@@ -124,6 +132,6 @@ block:       '{' listCmd '}'
 %%
 
 void yyerror() {
-    fprintf(stderr, "Opps. Syntax error in line %d!\n", lineNumber);
+    fprintf(stderr, "Opps. Syntax error on line %d!\n", lineNumber);
     exit(3);
 }
