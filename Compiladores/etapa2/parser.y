@@ -29,27 +29,86 @@
 
 %token TOKEN_ERROR
 
+%left '-' '+'
+%left '/' '*'
+%left '>' '<' '<=' '>=' '==' '!='
+%left '&' '|' '~'
+%right TK_IDENTIFIER '('
+
+
 %%
 
-program: cmd tail
+program: cmd listCmd
          |
          ;
 
-tail:    cmd tail
+listCmd: cmd listCmd
          |
          ;
 
 cmd:     TK_IDENTIFIER '=' expr ';'
+         | TK_IDENTIFIER '[' expr ']' '=' expr ';'
          | KW_CARA TK_IDENTIFIER '=' expr ';'
          | KW_INTE TK_IDENTIFIER '=' expr ';'
          | KW_REAL TK_IDENTIFIER '=' expr ';'
+         | KW_INTE TK_IDENTIFIER '[' index ']' array ';'
+         | KW_CARA TK_IDENTIFIER '[' index ']' array ';'
+         | KW_REAL TK_IDENTIFIER '[' index ']' array ';'
+
+         | KW_CARA TK_IDENTIFIER '(' arrayParams ')' block
+         | KW_INTE TK_IDENTIFIER '(' arrayParams ')' block
+         | KW_REAL TK_IDENTIFIER '(' arrayParams ')' block
+         | KW_ESCREVA arrayPrint ';'
+         | block
          ;
 
-expr:    LIT_CHAR
+expr:    TK_IDENTIFIER
+         | TK_IDENTIFIER '[' expr ']'
+         | TK_IDENTIFIER '(' array ')'
+         | LIT_CHAR
          | LIT_INTEIRO
          | LIT_FLOAT
+         | expr '+' expr
+         | expr '-' expr
+         | expr '*' expr
+         | expr '/' expr
+         | expr '<' expr
+         | expr '>' expr
+         | expr '<=' expr
+         | expr '>=' expr
+         | expr '==' expr
+         | expr '!=' expr
+         | expr '&' expr
+         | expr '|' expr
+         | expr '~' expr
+         | '(' expr ')'
+         | KW_ENTRADA
          ;
 
+index:   LIT_INTEIRO
+         | TK_IDENTIFIER
+         ;
+
+array:   expr array
+         |
+         ;
+
+param:   KW_CARA TK_IDENTIFIER
+         | KW_INTE TK_IDENTIFIER
+         | KW_REAL TK_IDENTIFIER
+         ;
+
+arrayParams: param arrayParams
+             |
+             ;
+
+arrayPrint:  LIT_STRING arrayPrint
+             | expr arrayPrint
+             |
+             ;
+
+block:       '{' listCmd '}'
+             ;
 %%
 
 void yyerror() {
