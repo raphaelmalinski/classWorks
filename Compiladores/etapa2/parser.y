@@ -31,34 +31,46 @@
 
 %left '-' '+'
 %left '/' '*'
-%left '>' '<' '<=' '>=' '==' '!='
+%left '>' '<' OPERATOR_LE OPERATOR_GE OPERATOR_EQ OPERATOR_DIF
 %left '&' '|' '~'
 %right TK_IDENTIFIER '('
 
 
 %%
 
-program: cmd listCmd
+program: cmd
+         | cmd ';' listCmd
+         | var listCmd
+         | function listCmd
          |
          ;
 
-listCmd: cmd listCmd
+listCmd: cmd
+         | cmd ';' listCmd
+         | var listCmd
+         | function listCmd
          |
          ;
-
-cmd:     TK_IDENTIFIER '=' expr ';'
-         | TK_IDENTIFIER '[' expr ']' '=' expr ';'
-         | KW_CARA TK_IDENTIFIER '=' expr ';'
+        
+var:     KW_CARA TK_IDENTIFIER '=' expr ';'
          | KW_INTE TK_IDENTIFIER '=' expr ';'
          | KW_REAL TK_IDENTIFIER '=' expr ';'
          | KW_INTE TK_IDENTIFIER '[' index ']' array ';'
          | KW_CARA TK_IDENTIFIER '[' index ']' array ';'
          | KW_REAL TK_IDENTIFIER '[' index ']' array ';'
+         ;
 
-         | KW_CARA TK_IDENTIFIER '(' arrayParams ')' block
-         | KW_INTE TK_IDENTIFIER '(' arrayParams ')' block
-         | KW_REAL TK_IDENTIFIER '(' arrayParams ')' block
-         | KW_ESCREVA arrayPrint ';'
+function: KW_CARA TK_IDENTIFIER '(' arrayParams ')' block
+          | KW_INTE TK_IDENTIFIER '(' arrayParams ')' block
+          | KW_REAL TK_IDENTIFIER '(' arrayParams ')' block
+
+cmd:     TK_IDENTIFIER '=' expr
+         | TK_IDENTIFIER '[' expr ']' '=' expr
+         | cmd KW_ENQUANTO '(' expr ')'
+         | KW_ENTAUM cmd KW_SE '(' expr ')'
+         | KW_ENTAUM cmd KW_SENAUM cmd KW_SE '(' expr ')'
+         | KW_ESCREVA arrayPrint
+         | KW_RETORNE expr
          | block
          ;
 
@@ -74,10 +86,10 @@ expr:    TK_IDENTIFIER
          | expr '/' expr
          | expr '<' expr
          | expr '>' expr
-         | expr '<=' expr
-         | expr '>=' expr
-         | expr '==' expr
-         | expr '!=' expr
+         | expr OPERATOR_EQ expr
+         | expr OPERATOR_DIF expr
+         | expr OPERATOR_GE expr
+         | expr OPERATOR_LE expr
          | expr '&' expr
          | expr '|' expr
          | expr '~' expr
