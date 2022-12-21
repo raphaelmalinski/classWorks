@@ -52,8 +52,12 @@ inte main ()
 
 inte incn (inte x, inte n )
   {
+  entaum se (a==15);
   retorne x + n
   }
+
+inte tese () {}
+
 
 // fim de arquivo
   

@@ -46,17 +46,18 @@
 
 %%
 
-program: cmd
-         | cmd ';' listCmd
-         | var listCmd
-         | function listCmd
+program: block
+         | listDeclarations
          ;
 
 listCmd: cmd
          | cmd ';' listCmd
-         | var listCmd
-         | function listCmd
          ;
+
+listDeclarations: var listDeclarations
+                  | function listDeclarations
+                  |
+                  ;
         
 var:     KW_CARA TK_IDENTIFIER '=' expr ';'
          | KW_INTE TK_IDENTIFIER '=' expr ';'
