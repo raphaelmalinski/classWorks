@@ -50,14 +50,12 @@ program: cmd
          | cmd ';' listCmd
          | var listCmd
          | function listCmd
-         |
          ;
 
 listCmd: cmd
          | cmd ';' listCmd
          | var listCmd
          | function listCmd
-         |
          ;
         
 var:     KW_CARA TK_IDENTIFIER '=' expr ';'
@@ -80,6 +78,7 @@ cmd:     TK_IDENTIFIER '=' expr
          | KW_ESCREVA arrayPrint
          | KW_RETORNE expr
          | block
+         |
          ;
 
 expr:    TK_IDENTIFIER
