@@ -1,0 +1,9 @@
+// UFRGS - Compiladores - Marcelo Johann - 2022/2
+
+inte a=0;
+inte b=3;
+inte fun () {
+    a = 5;
+    b = 777;
+    x = 99 + b - (x) + 1111
+}

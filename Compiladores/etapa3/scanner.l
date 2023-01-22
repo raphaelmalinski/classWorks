@@ -1,9 +1,12 @@
 %{
-  #include "hash.h"
-  #include "y.tab.h"
+int lineNumber = 1;
+int running = 1;
 
-  int lineNumber = 1;
-  int running = 1;
+#include "hash.c"
+#include "ast.c"
+
+#include "y.tab.h"
+#include "y.tab.c"
 %}
 
 %x COMMENT
@@ -51,6 +54,8 @@
 <COMMENT>"\\\\\\" { BEGIN(INITIAL); }
 
 %%
+
+#include "main.c"
 
 int yywrap() {
   running = 0;
