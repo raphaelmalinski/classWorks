@@ -41,6 +41,8 @@
 #define AST_ATTR_ARRAY_CARA 37
 #define AST_ATTR_ARRAY_REAL 38
 #define AST_LIST_DECLARATIONS 39
+#define AST_BLOCK 40
+#define AST_FUNCTION 41
 
 typedef struct ast_node {
     int type;
@@ -113,7 +115,8 @@ void astPrint(AST* node, int level) {
         case AST_ATTR_ARRAY_CARA: fprintf(stderr, "AST_ATTR_ARRAY_CARA"); break;
         case AST_ATTR_ARRAY_REAL: fprintf(stderr, "AST_ATTR_ARRAY_REAL"); break;
         case AST_LIST_DECLARATIONS: fprintf(stderr, "AST_LIST_DECLARATIONS"); break;
-
+        case AST_BLOCK: fprintf(stderr, "AST_BLOCK"); break;
+        case AST_FUNCTION: fprintf(stderr, "AST_FUNCTION"); break;
         default: fprintf(stderr, "AST_UNKNOWN,\n"); break;
     }
 

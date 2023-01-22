@@ -92,13 +92,13 @@ cmd:     TK_IDENTIFIER '=' expr                           { $$ = astCreate(AST_A
          | KW_ENTAUM cmd KW_SENAUM cmd KW_SE '(' expr ')' { $$ = astCreate(AST_SE_SENAO, 0, $2, $4, $7, 0); }
          | KW_ESCREVA arrayPrint                          { $$ = astCreate(AST_ESCREVA, 0, $2, 0, 0, 0); }
          | KW_RETORNE expr                                { $$ = astCreate(AST_RETORNE, 0, $2, 0, 0, 0); }
-         | block                                          { $$ = $1; }
+         | block                                          { $$ = astCreate(AST_BLOCK, 0, $1, 0, 0, 0); }
          |                                                { $$ = 0; }
          ;
 
 expr:    TK_IDENTIFIER                  { $$ = astCreate(AST_SYMBOL, $1, 0, 0, 0, 0); }
          | TK_IDENTIFIER '[' expr ']'   { $$ = astCreate(AST_SYMBOL, $1, $3, 0, 0, 0); }
-         | TK_IDENTIFIER '(' array ')'  { $$ = astCreate(AST_SYMBOL, $1, $3, 0, 0, 0); }
+         | TK_IDENTIFIER '(' array ')'  { $$ = astCreate(AST_FUNCTION, $1, $3, 0, 0, 0); }
          | LIT_CHAR                     { $$ = astCreate(AST_SYMBOL, $1, 0, 0, 0, 0); }
          | LIT_INTEIRO                  { $$ = astCreate(AST_SYMBOL, $1, 0, 0, 0, 0); }
          | LIT_FLOAT                    { $$ = astCreate(AST_SYMBOL, $1, 0, 0, 0, 0); }
@@ -141,7 +141,7 @@ arrayPrint:  LIT_STRING arrayPrint      { $$ = astCreate(AST_ARRAY_PRINT, $1, $2
              |                          { $$ = 0; }
              ;
 
-block:       '{' listCmd '}' { $$ = $2; }
+block:       '{' listCmd '}' { $$ = astCreate(AST_BLOCK, 0, $2, 0, 0, 0); }
              ;
 %%
 
