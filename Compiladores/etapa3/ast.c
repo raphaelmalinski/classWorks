@@ -162,7 +162,11 @@ void descompila(AST* node, FILE * output) {
         case AST_ATTR_ARRAY_CARA: fputs("cara ", output); fputs(node->symbol->text, output); fputs("[", output); break;
         case AST_ATTR_ARRAY_REAL: fputs("real ", output); fputs(node->symbol->text, output); fputs("[", output); break;
         case AST_FUNCTION: fputs(node->symbol->text, output); fputs("(", output); if(!node->son[0]) { fputs(")", output); } break;
-        case AST_LIST_DECLARATIONS: descompila(node->son[0], output); fputs(";\n", output); break;
+        case AST_LIST_DECLARATIONS: 
+            if(node->son[0]->type == AST_FUNCTION_INTE || node->son[0]->type == AST_FUNCTION_CARA || node->son[0]->type == AST_FUNCTION_REAL) {
+                descompila(node->son[0], output); fputs("\n", output);
+            } 
+            else { descompila(node->son[0], output); fputs(";\n", output); } break;
         default: break;
     }
 
