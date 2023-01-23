@@ -145,7 +145,7 @@ void descompila(AST* node, FILE * output) {
         case AST_SYMBOL: fputs(node->symbol->text, output); break;
         case AST_ENTRADA: fputs("entrada", output); break;
         case AST_ATTR: fputs(node->symbol->text, output); fputs(" = ", output); break;
-        case AST_ARRAY_PRINT: if(!node->son[0]) { fputs(node->symbol->text, output); descompila(node->son[0], output); } break;
+        case AST_ARRAY_PRINT: if(!node->son[0]) { fputs(node->symbol->text, output); } break;
         case AST_KW_INTE: fputs("inte ", output); fputs(node->symbol->text, output); break;
         case AST_KW_CARA: fputs("cara ", output); fputs(node->symbol->text, output); break;
         case AST_KW_REAL: fputs("real ", output); fputs(node->symbol->text, output); break;
@@ -211,13 +211,22 @@ void descompila(AST* node, FILE * output) {
                 case AST_LIST_CMD: descompila(node->son[i], output); if(node->son[++i]) fputs(";\n", output); descompila(node->son[i], output); break;
                 case AST_ESCREVA: fputs("escreva ", output); descompila(node->son[i], output); break;
                 case AST_ARRAY_PRINT: 
-                    if(node->son[i]->type == AST_ARRAY_PRINT) { fputs(node->symbol->text, output); fputs(" ", output); descompila(node->son[i], output); }
+                    if(node->son[i]->type == AST_ARRAY_PRINT) { 
+                        if(node->symbol) { fputs(node->symbol->text, output); } fputs(" ", output); descompila(node->son[i], output); 
+                    }
                     else { descompila(node->son[i], output); } break;
                 case AST_RETORNE: fputs("retorne ", output); descompila(node->son[i], output); break;
                 case AST_ENQUANTO: descompila(node->son[i], output); fputs(" enquanto(", output); 
                                    descompila(node->son[++i], output); fputs(")", output); break;
-                case AST_SE: fputs(" entaum ", output); descompila(node->son[i], output); fputs(" se(", output); 
-                                   descompila(node->son[++i], output); fputs(")", output); break;
+                case AST_SE: 
+                    if(node->son[i]->type == AST_BLOCK) {
+                        fputs(" entaum ", output); descompila(node->son[i], output); fputs(" se(", output); 
+                        descompila(node->son[++i], output); fputs(")", output);
+                    }
+                    else {
+                        fputs(" entaum ", output); fputs(" se(", output); 
+                        descompila(node->son[i], output); fputs(")", output);
+                    } break;
                 case AST_SE_SENAO: fputs(" entaum ", output); descompila(node->son[i], output); fputs(" senaum ", output); 
                                    descompila(node->son[++i], output); fputs(" se(", output); 
                                    descompila(node->son[++i], output);  fputs(")", output); break;
