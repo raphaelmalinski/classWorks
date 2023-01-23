@@ -4,6 +4,8 @@
 
   int yylex();
   void yyerror();
+
+  AST *astOutput;
 %}
 
 %union {
@@ -60,8 +62,8 @@
 
 %%
 
-program: block              { astPrint($1, 0); $$ = $1; }
-         | listDeclarations { astPrint($1, 0); $$ = $1; }
+program: block              { astOutput = $1; astPrint($1, 0); $$ = $1; }
+         | listDeclarations { astOutput = $1; astPrint($1, 0); $$ = $1; }
          ;
 
 listCmd: cmd                { $$ = astCreate(AST_LIST_CMD, 0, $1, 0, 0, 0); }
@@ -115,7 +117,7 @@ expr:    TK_IDENTIFIER                  { $$ = astCreate(AST_SYMBOL, $1, 0, 0, 0
          | expr '&' expr                { $$ = astCreate(AST_AND, 0, $1, $3, 0, 0); }
          | expr '|' expr                { $$ = astCreate(AST_OR, 0, $1, $3, 0, 0); }
          | expr '~' expr                { $$ = astCreate(AST_NOT, 0, $1, $3, 0, 0); }
-         | '(' expr ')'                 { $$ = $2; }
+         | '(' expr ')'                 { $$ = astCreate(AST_EXPR_PARENTESES, 0, $2, 0, 0, 0); }
          | KW_ENTRADA                   { $$ = astCreate(AST_ENTRADA, 0, 0, 0, 0, 0); }
          ;
 
