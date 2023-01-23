@@ -99,7 +99,7 @@ cmd:     TK_IDENTIFIER '=' expr                           { $$ = astCreate(AST_A
          ;
 
 expr:    TK_IDENTIFIER                  { $$ = astCreate(AST_SYMBOL, $1, 0, 0, 0, 0); }
-         | TK_IDENTIFIER '[' expr ']'   { $$ = astCreate(AST_SYMBOL, $1, $3, 0, 0, 0); }
+         | TK_IDENTIFIER '[' expr ']'   { $$ = astCreate(AST_SYMBOL_ARRAY, $1, $3, 0, 0, 0); }
          | TK_IDENTIFIER '(' array ')'  { $$ = astCreate(AST_FUNCTION, $1, $3, 0, 0, 0); }
          | LIT_CHAR                     { $$ = astCreate(AST_SYMBOL, $1, 0, 0, 0, 0); }
          | LIT_INTEIRO                  { $$ = astCreate(AST_SYMBOL, $1, 0, 0, 0, 0); }
