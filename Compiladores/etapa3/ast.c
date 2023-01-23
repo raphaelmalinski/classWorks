@@ -44,6 +44,7 @@
 #define AST_BLOCK 40
 #define AST_FUNCTION 41
 #define AST_EXPR_PARENTESES 42
+#define AST_SYMBOL_ARRAY 43
 
 typedef struct ast_node {
     int type;
@@ -119,6 +120,7 @@ void astPrint(AST* node, int level) {
         case AST_BLOCK: fprintf(stderr, "AST_BLOCK"); break;
         case AST_FUNCTION: fprintf(stderr, "AST_FUNCTION"); break;
         case AST_EXPR_PARENTESES: fprintf(stderr, "AST_EXPR_PARENTESES"); break;
+        case AST_SYMBOL_ARRAY: fprintf(stderr, "AST_SYMBOL_ARRAY"); break;
         default: fprintf(stderr, "AST_UNKNOWN,\n"); break;
     }
 
@@ -141,19 +143,6 @@ void descompila(AST* node, FILE * output) {
 
     switch (node->type) {
         case AST_SYMBOL: fputs(node->symbol->text, output); break;
-        // case AST_ADD: descompila(node->son[0], output); break;
-        // case AST_SUB: descompila(node->son[0], level); fwrite(" - ", sizeof(char), 3, output); descompila(node->son[1], level+1); break;
-        // case AST_MUL: fprintf(stderr, "AST_MUL"); break;
-        // case AST_DIV: fprintf(stderr, "AST_DIV"); break;
-        // case AST_LESS: fprintf(stderr, "AST_LESS"); break;
-        // case AST_GREATER: fprintf(stderr, "AST_GREATER"); break;
-        // case AST_EQ: fprintf(stderr, "AST_EQ"); break;
-        // case AST_DIF: fprintf(stderr, "AST_DIF"); break;
-        // case AST_GE: fprintf(stderr, "AST_GE"); break;
-        // case AST_LE: fprintf(stderr, "AST_LE"); break;
-        // case AST_AND: fprintf(stderr, "AST_AND"); break;
-        // case AST_OR: fprintf(stderr, "AST_OR"); break;
-        // case AST_NOT: fprintf(stderr, "AST_NOT"); break;
         // case AST_ENTRADA: fprintf(stderr, "AST_ENTRADA"); break;
         // case AST_ARRAY: fprintf(stderr, "AST_ARRAY"); break;
         // case AST_ATTR: fprintf(stderr, "AST_ATTR"); break;
@@ -172,15 +161,16 @@ void descompila(AST* node, FILE * output) {
         // case AST_FUNCTION_CARA: fprintf(stderr, "AST_FUNCTION_CARA"); break;
         // case AST_FUNCTION_INTE: fprintf(stderr, "AST_FUNCTION_INTE"); break;
         // case AST_FUNCTION_REAL: fprintf(stderr, "AST_FUNCTION_REAL"); break;
-        // case AST_ATTR_CARA: fprintf(stderr, "AST_ATTR_CARA"); break;
         case AST_ATTR_INTE: fputs("inte ", output); fputs(node->symbol->text, output); fputs(" = ", output); break;
-        // case AST_ATTR_REAL: fprintf(stderr, "AST_ATTR_REAL"); break;
-        // case AST_ATTR_ARRAY_INTE: fprintf(stderr, "AST_ATTR_ARRAY_INTE"); break;
+        case AST_ATTR_CARA: fputs("cara ", output); fputs(node->symbol->text, output); fputs(" = ", output); break;
+        case AST_ATTR_REAL: fputs("real ", output); fputs(node->symbol->text, output); fputs(" = ", output); break;
+        // case AST_SYMBOL_ARRAY: fputs(node->symbol->text, output); fputs("[", output); descompila(node->son[0], output);
+        //                        fputs("]", output); fputs(" = ", output); break;
+        case AST_ATTR_ARRAY_INTE: fputs("inte ", output); fputs(node->symbol->text, output); fputs("[", output); break;
         // case AST_ATTR_ARRAY_CARA: fprintf(stderr, "AST_ATTR_ARRAY_CARA"); break;
         // case AST_ATTR_ARRAY_REAL: fprintf(stderr, "AST_ATTR_ARRAY_REAL"); break;
         // case AST_BLOCK: fprintf(stderr, "AST_BLOCK"); break;
         // case AST_FUNCTION: fprintf(stderr, "AST_FUNCTION"); break;
-        // case AST_EXPR_PARENTESES: fputs("(", output); descompila(node->son[0], level+1); fputs(")", output); break;
         case AST_LIST_DECLARATIONS: descompila(node->son[0], output); fputs(";\n", output); break;
         default: break;
     }
@@ -192,6 +182,19 @@ void descompila(AST* node, FILE * output) {
                 case AST_SUB: descompila(node->son[i], output); fputs(" - ", output); descompila(node->son[++i], output); break;
                 case AST_MUL: descompila(node->son[i], output); fputs(" * ", output); descompila(node->son[++i], output); break;
                 case AST_DIV: descompila(node->son[i], output); fputs(" / ", output); descompila(node->son[++i], output); break;
+                case AST_LESS: descompila(node->son[i], output); fputs(" < ", output); descompila(node->son[++i], output); break;
+                case AST_GREATER: descompila(node->son[i], output); fputs(" > ", output); descompila(node->son[++i], output); break;
+                case AST_EQ: descompila(node->son[i], output); fputs(" == ", output); descompila(node->son[++i], output); break;
+                case AST_DIF: descompila(node->son[i], output); fputs(" != ", output); descompila(node->son[++i], output); break;
+                case AST_GE: descompila(node->son[i], output); fputs(" >= ", output); descompila(node->son[++i], output); break;
+                case AST_LE: descompila(node->son[i], output); fputs(" <= ", output); descompila(node->son[++i], output); break;
+                case AST_AND: descompila(node->son[i], output); fputs(" & ", output); descompila(node->son[++i], output); break;
+                case AST_OR: descompila(node->son[i], output); fputs(" | ", output); descompila(node->son[++i], output); break;
+                case AST_NOT: descompila(node->son[i], output); fputs(" ~ ", output); descompila(node->son[++i], output); break;
+                case AST_EXPR_PARENTESES: fputs("(", output); descompila(node->son[i], output); fputs(")", output); break;
+                case AST_BLOCK: fputs("{\n", output); descompila(node->son[i], output); fputs("\n}", output); break;
+                case AST_ATTR_ARRAY_INTE: descompila(node->son[i], output); fputs("] ", output); descompila(node->son[++i], output); break;
+                case AST_ARRAY: descompila(node->son[i], output); fputs(" ", output); break;
                 case AST_LIST_DECLARATIONS: descompila(node->son[++i], output); break;
                 default: descompila(node->son[i], output); break;
             }
