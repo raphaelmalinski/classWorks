@@ -15,8 +15,6 @@ typedef struct hash_node {
     struct hash_node *next;
 } HASH;
 
-HASH *Table[HASH_SIZE];
-
 void initMe(void);
 int hashAddress(char *text);
 HASH * hashFind(char *text);

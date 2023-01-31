@@ -1,12 +1,9 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "hash.h"
 
-int getLineNumber(void) {
-  return lineNumber;
-}
-
-int isRunning(void) {
-  return running;
-}
+extern HASH *Table[HASH_SIZE];
 
 void initMe(void) {
   int i = 0;

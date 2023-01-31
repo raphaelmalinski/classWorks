@@ -1,17 +1,23 @@
 %{
-  #include "hash.h"
-  #include "ast.h"
-
-  int yylex();
-  void yyerror();
-
-  AST *astOutput;
+#include <stdio.h>
+#include <stdlib.h>
+#include "hash.h"
+#include "ast.h"
 %}
 
 %union {
   HASH *symbol;
   AST *ast;
 }
+
+%{
+int yylex();
+void yyerror();
+
+AST *astOutput;
+
+extern int lineNumber;
+%}
 
 %token KW_CARA
 %token KW_INTE

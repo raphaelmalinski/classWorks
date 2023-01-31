@@ -2,11 +2,11 @@
 int lineNumber = 1;
 int running = 1;
 
-#include "hash.c"
-#include "ast.c"
-
+#include "hash.h"
+#include "ast.h"
 #include "y.tab.h"
-#include "y.tab.c"
+
+HASH *Table[HASH_SIZE];
 %}
 
 %x COMMENT
@@ -54,8 +54,6 @@ int running = 1;
 <COMMENT>"\\\\\\" { BEGIN(INITIAL); }
 
 %%
-
-#include "main.c"
 
 int yywrap() {
   running = 0;

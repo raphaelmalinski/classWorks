@@ -1,5 +1,5 @@
-#ifndef HASH_HEADER
-#define HASH_HEADER
+#ifndef AST_HEADER
+#define AST_HEADER
 
 #include "hash.h"
 
@@ -44,6 +44,10 @@
 #define AST_ATTR_ARRAY_CARA 37
 #define AST_ATTR_ARRAY_REAL 38
 #define AST_LIST_DECLARATIONS 39
+#define AST_BLOCK 40
+#define AST_FUNCTION 41
+#define AST_EXPR_PARENTESES 42
+#define AST_SYMBOL_ARRAY 43
 
 typedef struct ast_node {
     int type;
@@ -53,5 +57,8 @@ typedef struct ast_node {
 
 AST * astCreate(int type, HASH * symbol, AST* son0, AST* son1, AST* son2, AST* son3);
 void astPrint(AST* node, int level);
+void descompila(AST* node, FILE * output);
 
 #endif
+
+// END OF FILE
