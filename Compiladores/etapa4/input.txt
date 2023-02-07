@@ -1,0 +1,19 @@
+// UFRGS - Compiladores - Marcelo Johann - 2022/2
+
+cara c='x';
+cara d=100;
+inte a.5='A';
+inte i=1;
+inte v[10] 'a' 0 0 0 0 0 0 0 0 0;
+inte matrix[100]; 
+real f=2.5;
+
+cara tese () {}
+
+cara c='z';
+cara tese () {}
+cara r = 4 + i;
+
+
+// fim de arquivo
+  
