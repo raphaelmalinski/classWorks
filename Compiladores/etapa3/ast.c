@@ -165,12 +165,12 @@ void descompila(AST* node, FILE * output) {
                 case AST_ENQUANTO: descompila(node->son[i], output); fputs(" enquanto(", output); 
                                    descompila(node->son[++i], output); fputs(")", output); break;
                 case AST_SE: 
-                    if(node->son[i]->type == AST_BLOCK) {
+                    if(node->son[i]->type == AST_BLOCK || node->son[i+1]) {
                         fputs(" entaum ", output); descompila(node->son[i], output); fputs(" se(", output); 
                         descompila(node->son[++i], output); fputs(")", output);
                     }
                     else {
-                        fputs(" entaum ", output); fputs(" se(", output); 
+                        fputs(" entaum ", output); fputs(" se(", output);
                         descompila(node->son[i], output); fputs(")", output);
                     } break;
                 case AST_SE_SENAO: fputs(" entaum ", output); descompila(node->son[i], output); fputs(" senaum ", output); 
