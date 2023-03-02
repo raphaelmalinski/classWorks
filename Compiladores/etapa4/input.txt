@@ -12,7 +12,7 @@ cara tese () {}
 
 cara c='z';
 cara tese () {}
-cara r = 4 + i;
+cara r = 4 + 3;
 
 
 // fim de arquivo

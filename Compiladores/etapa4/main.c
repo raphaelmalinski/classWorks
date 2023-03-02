@@ -23,16 +23,16 @@ int main(int argc, char** argv) {
     exit(2);
   }
 
-  // if(0 == (output = fopen(argv[2], "w"))) {
-  //   fprintf(stderr, "Cannot open file %s\n", argv[2]);
-  //   exit(3);
-  // }
+  if(0 == (output = fopen(argv[2], "w"))) {
+    fprintf(stderr, "Cannot open file %s\n", argv[2]);
+    exit(3);
+  }
   
   initMe();
 
   yyparse();
 
-  // descompila(astOutput, output);
+  descompila(astOutput, output);
 
   if(!getSemanticErrors())
     printf("SUPER SUCCESS!!! This is a program! \nFile had %d lines\n", lineNumber);
