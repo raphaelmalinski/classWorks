@@ -123,7 +123,7 @@ expr:    TK_IDENTIFIER                  { $$ = astCreate(AST_SYMBOL, $1, 0, 0, 0
          | expr OPERATOR_LE expr        { $$ = astCreate(AST_LE, 0, $1, $3, 0, 0); }
          | expr '&' expr                { $$ = astCreate(AST_AND, 0, $1, $3, 0, 0); }
          | expr '|' expr                { $$ = astCreate(AST_OR, 0, $1, $3, 0, 0); }
-         | expr '~' expr                { $$ = astCreate(AST_NOT, 0, $1, $3, 0, 0); }
+         | '~' expr                     { $$ = astCreate(AST_NOT, 0, $2, 0, 0, 0); }
          | '(' expr ')'                 { $$ = astCreate(AST_EXPR_PARENTESES, 0, $2, 0, 0, 0); }
          | KW_ENTRADA                   { $$ = astCreate(AST_ENTRADA, 0, 0, 0, 0, 0); }
          ;

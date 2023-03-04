@@ -131,7 +131,7 @@ void descompila(AST* node, FILE * output) {
                 case AST_LE: descompila(node->son[i], output); fputs(" <= ", output); descompila(node->son[++i], output); break;
                 case AST_AND: descompila(node->son[i], output); fputs(" & ", output); descompila(node->son[++i], output); break;
                 case AST_OR: descompila(node->son[i], output); fputs(" | ", output); descompila(node->son[++i], output); break;
-                case AST_NOT: descompila(node->son[i], output); fputs(" ~ ", output); descompila(node->son[++i], output); break;
+                case AST_NOT: fputs(" ~ ", output); descompila(node->son[i], output); break;
                 case AST_EXPR_PARENTESES: fputs("(", output); descompila(node->son[i], output); fputs(")", output); break;
                 case AST_ATTR_ARRAY_INTE: descompila(node->son[i], output); fputs("] ", output); descompila(node->son[++i], output); break;
                 case AST_ATTR_ARRAY_CARA: descompila(node->son[i], output); fputs("] ", output); descompila(node->son[++i], output); break;

@@ -52,7 +52,7 @@ inte main ()
 
 inte incn (inte x, inte n )
   {
-  entaum a = a+1 se (a==15);
+  entaum a = a+1 se (~a);
   retorne x + n
   }
 
