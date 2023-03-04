@@ -25,6 +25,17 @@ void tacPrint(TAC* tac) {
         case TAC_ADD: fprintf(stderr, "TAC_ADD"); break;
         case TAC_SUB: fprintf(stderr, "TAC_SUB"); break;
         case TAC_COPY: fprintf(stderr, "TAC_COPY"); break;
+        case TAC_MUL: fprintf(stderr, "TAC_MUL"); break;
+        case TAC_DIV: fprintf(stderr, "TAC_DIV"); break;
+        case TAC_LESS: fprintf(stderr, "TAC_LESS"); break;
+        case TAC_GREATER: fprintf(stderr, "TAC_GREATER"); break;
+        case TAC_EQ: fprintf(stderr, "TAC_EQ"); break;
+        case TAC_DIF: fprintf(stderr, "TAC_DIF"); break;
+        case TAC_GE: fprintf(stderr, "TAC_GE"); break;
+        case TAC_LE: fprintf(stderr, "TAC_LE"); break;
+        case TAC_AND: fprintf(stderr, "TAC_AND"); break;
+        case TAC_OR: fprintf(stderr, "TAC_OR"); break;
+        case TAC_NOT: fprintf(stderr, "TAC_NOT"); break;
         default: fprintf(stderr, "TAC_UNKNOWN"); break;
     }
 
@@ -57,6 +68,10 @@ TAC* tacJoin(TAC* l1, TAC* l2) {
 
 // CODE GENERATION
 
+TAC* makeBinOperation(int op, TAC* code[MAX_SONS]) {
+    return tacJoin(tacJoin(code[0], code[1]), tacCreate(op, makeTemp(), code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0));
+}
+
 TAC* generateCode(AST *node){
     int i;
     TAC *result = 0;
@@ -72,8 +87,19 @@ TAC* generateCode(AST *node){
     // PROCESS THIS NODE
     switch (node->type) {
         case AST_SYMBOL: result = tacCreate(TAC_SYMBOL, node->symbol, 0, 0); break;
-        case AST_ADD: result = tacJoin(tacJoin(code[0], code[1]), 
-                               tacCreate(TAC_ADD, makeTemp(), code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0)); break;
+        case AST_ADD: result = makeBinOperation(TAC_ADD, code); break;
+        case AST_SUB: result = makeBinOperation(TAC_SUB, code); break;
+        case AST_MUL: result = makeBinOperation(TAC_MUL, code); break;
+        case AST_DIV: result = makeBinOperation(TAC_DIV, code); break;
+        case AST_LESS: result = makeBinOperation(TAC_LESS, code); break;
+        case AST_GREATER: result = makeBinOperation(TAC_GREATER, code); break;
+        case AST_EQ: result = makeBinOperation(TAC_EQ, code); break;
+        case AST_DIF: result = makeBinOperation(TAC_DIF, code); break;
+        case AST_GE: result = makeBinOperation(TAC_GE, code); break;
+        case AST_LE: result = makeBinOperation(TAC_LE, code); break;
+        case AST_AND: result = makeBinOperation(TAC_AND, code); break;
+        case AST_OR: result = makeBinOperation(TAC_OR, code); break;
+        case AST_NOT: result = tacJoin(code[0], tacCreate(TAC_NOT, makeTemp(), code[0] ? code[0]->res : 0, 0)); break;
         case AST_ATTR: result = tacJoin(code[0], tacCreate(TAC_COPY, node->symbol, code[0] ? code[0]->res : 0, 0)); break;
         default: result = tacJoin(code[0], tacJoin(code[1], tacJoin(code[2], code[3])));
                  break;
