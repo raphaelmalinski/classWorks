@@ -8,6 +8,7 @@
 #define SYMBOL_LIT_REAL 3
 #define SYMBOL_LIT_STRING 4
 #define SYMBOL_VARIABLE 5
+#define SYMBOL_LABEL 6
 #define SYMBOL_IDENTIFIER 7
 
 typedef struct hash_node {
@@ -22,6 +23,7 @@ HASH * hashFind(char *text);
 HASH *hashInsert(int type, char *text);
 void hashPrint(void);
 HASH* makeTemp(void);
+HASH* makeLabel(void);
 
 #endif
 

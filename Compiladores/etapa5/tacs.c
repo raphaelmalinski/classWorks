@@ -36,6 +36,8 @@ void tacPrint(TAC* tac) {
         case TAC_AND: fprintf(stderr, "TAC_AND"); break;
         case TAC_OR: fprintf(stderr, "TAC_OR"); break;
         case TAC_NOT: fprintf(stderr, "TAC_NOT"); break;
+        case TAC_JF: fprintf(stderr, "TAC_JF"); break;
+        case TAC_LABEL: fprintf(stderr, "TAC_LABEL"); break;
         default: fprintf(stderr, "TAC_UNKNOWN"); break;
     }
 
@@ -72,6 +74,8 @@ TAC* makeBinOperation(int op, TAC* code[MAX_SONS]) {
     return tacJoin(tacJoin(code[0], code[1]), tacCreate(op, makeTemp(), code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0));
 }
 
+TAC* makeSe(TAC* code0, TAC* code1);
+
 TAC* generateCode(AST *node){
     int i;
     TAC *result = 0;
@@ -101,9 +105,24 @@ TAC* generateCode(AST *node){
         case AST_OR: result = makeBinOperation(TAC_OR, code); break;
         case AST_NOT: result = tacJoin(code[0], tacCreate(TAC_NOT, makeTemp(), code[0] ? code[0]->res : 0, 0)); break;
         case AST_ATTR: result = tacJoin(code[0], tacCreate(TAC_COPY, node->symbol, code[0] ? code[0]->res : 0, 0)); break;
+        case AST_SE: result = makeSe(code[0], code[1]); break;
         default: result = tacJoin(code[0], tacJoin(code[1], tacJoin(code[2], code[3])));
                  break;
     }
 
     return result;
+}
+
+TAC* makeSe(TAC* code0, TAC* code1) {
+    TAC * jumptac = 0;
+    TAC * labeltac = 0;
+    HASH * newlabel = 0;
+
+    newlabel = makeLabel();
+
+    jumptac = tacCreate(TAC_JF, newlabel, code1 ? code1->res : 0, 0);
+    jumptac->prev = code1;
+    labeltac = tacCreate(TAC_LABEL, newlabel, 0, 0);
+    labeltac->prev = code0;
+    return tacJoin(jumptac, labeltac);
 }
