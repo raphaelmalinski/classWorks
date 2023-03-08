@@ -104,7 +104,11 @@ TAC* generateCode(AST *node){
         case AST_AND: result = makeBinOperation(TAC_AND, code); break;
         case AST_OR: result = makeBinOperation(TAC_OR, code); break;
         case AST_NOT: result = tacJoin(code[0], tacCreate(TAC_NOT, makeTemp(), code[0] ? code[0]->res : 0, 0)); break;
-        case AST_ATTR: result = tacJoin(code[0], tacCreate(TAC_MOVE, node->symbol, code[0] ? code[0]->res : 0, 0)); break;
+        case AST_ATTR:
+        case AST_ATTR_CARA:
+        case AST_ATTR_INTE:
+        case AST_ATTR_REAL:
+            result = tacJoin(code[0], tacCreate(TAC_MOVE, node->symbol, code[0] ? code[0]->res : 0, 0)); break;
         case AST_SE: result = makeSe(code[0], code[1]); break;
         default: result = tacJoin(code[0], tacJoin(code[1], tacJoin(code[2], code[3])));
                  break;
