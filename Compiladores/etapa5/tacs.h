@@ -7,7 +7,7 @@
 #define TAC_SYMBOL 1
 #define TAC_ADD 2
 #define TAC_SUB 3
-#define TAC_COPY 4
+#define TAC_MOVE 4
 #define TAC_MUL 5
 #define TAC_DIV 6
 #define TAC_LESS 7
@@ -19,7 +19,7 @@
 #define TAC_AND 13
 #define TAC_OR 14
 #define TAC_NOT 15
-#define TAC_JF 16
+#define TAC_IFZ 16
 #define TAC_LABEL 17
 
 typedef struct tacNode {

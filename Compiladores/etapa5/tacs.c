@@ -24,7 +24,7 @@ void tacPrint(TAC* tac) {
         case TAC_SYMBOL: fprintf(stderr, "TAC_SYMBOL"); break;
         case TAC_ADD: fprintf(stderr, "TAC_ADD"); break;
         case TAC_SUB: fprintf(stderr, "TAC_SUB"); break;
-        case TAC_COPY: fprintf(stderr, "TAC_COPY"); break;
+        case TAC_MOVE: fprintf(stderr, "TAC_MOVE"); break;
         case TAC_MUL: fprintf(stderr, "TAC_MUL"); break;
         case TAC_DIV: fprintf(stderr, "TAC_DIV"); break;
         case TAC_LESS: fprintf(stderr, "TAC_LESS"); break;
@@ -36,7 +36,7 @@ void tacPrint(TAC* tac) {
         case TAC_AND: fprintf(stderr, "TAC_AND"); break;
         case TAC_OR: fprintf(stderr, "TAC_OR"); break;
         case TAC_NOT: fprintf(stderr, "TAC_NOT"); break;
-        case TAC_JF: fprintf(stderr, "TAC_JF"); break;
+        case TAC_IFZ: fprintf(stderr, "TAC_IFZ"); break;
         case TAC_LABEL: fprintf(stderr, "TAC_LABEL"); break;
         default: fprintf(stderr, "TAC_UNKNOWN"); break;
     }
@@ -104,7 +104,7 @@ TAC* generateCode(AST *node){
         case AST_AND: result = makeBinOperation(TAC_AND, code); break;
         case AST_OR: result = makeBinOperation(TAC_OR, code); break;
         case AST_NOT: result = tacJoin(code[0], tacCreate(TAC_NOT, makeTemp(), code[0] ? code[0]->res : 0, 0)); break;
-        case AST_ATTR: result = tacJoin(code[0], tacCreate(TAC_COPY, node->symbol, code[0] ? code[0]->res : 0, 0)); break;
+        case AST_ATTR: result = tacJoin(code[0], tacCreate(TAC_MOVE, node->symbol, code[0] ? code[0]->res : 0, 0)); break;
         case AST_SE: result = makeSe(code[0], code[1]); break;
         default: result = tacJoin(code[0], tacJoin(code[1], tacJoin(code[2], code[3])));
                  break;
@@ -120,7 +120,7 @@ TAC* makeSe(TAC* code0, TAC* code1) {
 
     newlabel = makeLabel();
 
-    jumptac = tacCreate(TAC_JF, newlabel, code1 ? code1->res : 0, 0);
+    jumptac = tacCreate(TAC_IFZ, newlabel, code1 ? code1->res : 0, 0);
     jumptac->prev = code1;
     labeltac = tacCreate(TAC_LABEL, newlabel, 0, 0);
     labeltac->prev = code0;
