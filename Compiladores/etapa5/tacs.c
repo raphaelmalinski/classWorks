@@ -38,6 +38,7 @@ void tacPrint(TAC* tac) {
         case TAC_NOT: fprintf(stderr, "TAC_NOT"); break;
         case TAC_IFZ: fprintf(stderr, "TAC_IFZ"); break;
         case TAC_LABEL: fprintf(stderr, "TAC_LABEL"); break;
+        case TAC_JUMP: fprintf(stderr, "TAC_JUMP"); break;
         default: fprintf(stderr, "TAC_UNKNOWN"); break;
     }
 
@@ -75,6 +76,7 @@ TAC* makeBinOperation(int op, TAC* code[MAX_SONS]) {
 }
 
 TAC* makeSe(TAC* code0, TAC* code1);
+TAC* makeSeSenao(TAC* code0, TAC* code1, TAC* code2);
 
 TAC* generateCode(AST *node){
     int i;
@@ -110,6 +112,7 @@ TAC* generateCode(AST *node){
         case AST_ATTR_REAL:
             result = tacJoin(code[0], tacCreate(TAC_MOVE, node->symbol, code[0] ? code[0]->res : 0, 0)); break;
         case AST_SE: result = makeSe(code[0], code[1]); break;
+        case AST_SE_SENAO: result = makeSeSenao(code[0], code[1], code[2]); break;
         default: result = tacJoin(code[0], tacJoin(code[1], tacJoin(code[2], code[3])));
                  break;
     }
@@ -129,4 +132,29 @@ TAC* makeSe(TAC* code0, TAC* code1) {
     labeltac = tacCreate(TAC_LABEL, newlabel, 0, 0);
     labeltac->prev = code0;
     return tacJoin(jumptac, labeltac);
+}
+
+TAC* makeSeSenao(TAC* code0, TAC* code1, TAC* code2) {
+    TAC * jumpIfZtac = 0;
+    TAC * jumptac = 0;
+    TAC * labelIfZtac = 0;
+    TAC * labelJumptac = 0;
+
+    HASH * labelIfZ = 0;
+    HASH * labelJump = 0;
+
+    labelIfZ = makeLabel();
+    labelJump = makeLabel();
+
+    jumpIfZtac = tacCreate(TAC_IFZ, labelIfZ, code2 ? code2->res : 0, 0);
+    jumpIfZtac->prev = code2;
+    labelIfZtac = tacCreate(TAC_LABEL, labelIfZ, 0, 0);
+    labelIfZtac->prev = jumptac;
+
+    jumptac = tacCreate(TAC_JUMP, labelJump, 0, 0);
+    jumptac->prev = code0;
+    labelJumptac = tacCreate(TAC_LABEL, labelJump, 0, 0);
+    labelJumptac->prev = code1;
+    
+    return tacJoin(jumpIfZtac, tacJoin(jumptac, tacJoin(labelIfZtac, labelJumptac)));
 }

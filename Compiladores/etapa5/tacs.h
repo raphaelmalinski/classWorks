@@ -21,6 +21,7 @@
 #define TAC_NOT 15
 #define TAC_IFZ 16
 #define TAC_LABEL 17
+#define TAC_JUMP 18
 
 typedef struct tacNode {
     int type;
