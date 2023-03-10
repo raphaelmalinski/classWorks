@@ -39,6 +39,9 @@ void tacPrint(TAC* tac) {
         case TAC_IFZ: fprintf(stderr, "TAC_IFZ"); break;
         case TAC_LABEL: fprintf(stderr, "TAC_LABEL"); break;
         case TAC_JUMP: fprintf(stderr, "TAC_JUMP"); break;
+        case TAC_BEGINFUN: fprintf(stderr, "TAC_BEGINFUN"); break;
+        case TAC_ENDFUN: fprintf(stderr, "TAC_ENDFUN"); break;
+        case TAC_PARAMS_NEW_FUN: fprintf(stderr, "TAC_PARAMS_NEW_FUN"); break;
         default: fprintf(stderr, "TAC_UNKNOWN"); break;
     }
 
@@ -71,12 +74,12 @@ TAC* tacJoin(TAC* l1, TAC* l2) {
 
 // CODE GENERATION
 
+TAC* makeSe(TAC* code0, TAC* code1);
+TAC* makeSeSenao(TAC* code0, TAC* code1, TAC* code2);
+
 TAC* makeBinOperation(int op, TAC* code[MAX_SONS]) {
     return tacJoin(tacJoin(code[0], code[1]), tacCreate(op, makeTemp(), code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0));
 }
-
-TAC* makeSe(TAC* code0, TAC* code1);
-TAC* makeSeSenao(TAC* code0, TAC* code1, TAC* code2);
 
 TAC* generateCode(AST *node){
     int i;
@@ -113,6 +116,21 @@ TAC* generateCode(AST *node){
             result = tacJoin(code[0], tacCreate(TAC_MOVE, node->symbol, code[0] ? code[0]->res : 0, 0)); break;
         case AST_SE: result = makeSe(code[0], code[1]); break;
         case AST_SE_SENAO: result = makeSeSenao(code[0], code[1], code[2]); break;
+        case AST_FUNCTION_INTE:
+        case AST_FUNCTION_CARA:
+        case AST_FUNCTION_REAL:
+            result = tacJoin(
+                        tacJoin(
+                            tacJoin(
+                                tacJoin(
+                                    tacCreate(TAC_BEGINFUN, tacCreate(TAC_SYMBOL, node->symbol, 0, 0)->res, 0, 0),
+                                    code[0]
+                                ), code[1]
+                            ), code[2]
+                        ), tacCreate(TAC_ENDFUN, tacCreate(TAC_SYMBOL, node->symbol, 0, 0)->res, 0, 0)
+                     );
+            break;
+        case AST_ARRAY_PARAMS: result = tacJoin(code[3], tacJoin(tacCreate(TAC_PARAMS_NEW_FUN, node->son[0]->symbol, 0, 0), code[1])); break;
         default: result = tacJoin(code[0], tacJoin(code[1], tacJoin(code[2], code[3])));
                  break;
     }
