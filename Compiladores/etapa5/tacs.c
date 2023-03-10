@@ -85,6 +85,7 @@ TAC* tacJoin(TAC* l1, TAC* l2) {
 
 TAC* makeSe(TAC* code0, TAC* code1);
 TAC* makeSeSenao(TAC* code0, TAC* code1, TAC* code2);
+TAC* makeEnquanto(TAC* code0, TAC* code1);
 
 TAC* makeBinOperation(int op, TAC* code[MAX_SONS]) {
     return tacJoin(tacJoin(code[0], code[1]), tacCreate(op, makeTemp(), code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0));
@@ -125,6 +126,7 @@ TAC* generateCode(AST *node){
             result = tacJoin(code[0], tacCreate(TAC_MOVE, node->symbol, code[0] ? code[0]->res : 0, 0)); break;
         case AST_SE: result = makeSe(code[0], code[1]); break;
         case AST_SE_SENAO: result = makeSeSenao(code[0], code[1], code[2]); break;
+        case AST_ENQUANTO: result = makeEnquanto(code[0], code[1]); break;
         case AST_ATTR_ARRAY_INTE:
         case AST_ATTR_ARRAY_CARA:
         case AST_ATTR_ARRAY_REAL:
@@ -202,4 +204,36 @@ TAC* makeSeSenao(TAC* code0, TAC* code1, TAC* code2) {
     labelJumptac->prev = code1;
     
     return tacJoin(jumpIfZtac, tacJoin(jumptac, tacJoin(labelIfZtac, labelJumptac)));
+}
+
+TAC* makeEnquanto(TAC* code0, TAC* code1) {
+    TAC * jumpPrimeiroLacoTac = 0;
+    TAC * labelPrimeiroLacoTac = 0;
+    TAC * labelLoopTac = 0;
+    TAC * jumpLoopTac = 0;
+
+    TAC * inicioEnquantoTac = 0;
+    TAC * labelFimEnquantoTac = 0;
+
+    HASH * labelPrimeiroLaco = 0;
+    HASH * labelFimEnquanto = 0;
+    HASH * labelLoop = 0;
+
+    labelLoop = makeLabel();
+    labelPrimeiroLaco = makeLabel();
+    labelFimEnquanto = makeLabel();
+
+    jumpPrimeiroLacoTac = tacCreate(TAC_JUMP, labelPrimeiroLaco, 0, 0);
+    labelLoopTac = tacCreate(TAC_LABEL, labelLoop, 0, 0);
+    labelLoopTac->prev = jumpPrimeiroLacoTac;
+    inicioEnquantoTac = tacCreate(TAC_IFZ, labelFimEnquanto, code1 ? code1->res : 0, 0);
+    inicioEnquantoTac->prev = code1;
+    labelPrimeiroLacoTac = tacCreate(TAC_LABEL, labelPrimeiroLaco, 0, 0);
+    labelPrimeiroLacoTac->prev = inicioEnquantoTac;
+    jumpLoopTac = tacCreate(TAC_JUMP, labelLoop, 0, 0);
+    jumpLoopTac->prev = code0;
+    labelFimEnquantoTac = tacCreate(TAC_LABEL, labelFimEnquanto, 0, 0);
+    labelFimEnquantoTac->prev = jumpLoopTac;
+
+    return tacJoin(labelLoopTac, tacJoin(labelPrimeiroLacoTac, labelFimEnquantoTac));
 }
