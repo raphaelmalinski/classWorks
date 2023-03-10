@@ -48,6 +48,9 @@ void tacPrint(TAC* tac) {
         case TAC_PARAMS_NEW_FUN: fprintf(stderr, "TAC_PARAMS_NEW_FUN"); break;
         case TAC_CALL_FUN: fprintf(stderr, "TAC_CALL_FUN"); break;
         case TAC_PARAM_CALL: fprintf(stderr, "TAC_PARAM_CALL"); break;
+        case TAC_RET: fprintf(stderr, "TAC_RET"); break;
+        case TAC_PRINT: fprintf(stderr, "TAC_PRINT"); break;
+        case TAC_READ: fprintf(stderr, "TAC_READ"); break;
         default: fprintf(stderr, "TAC_UNKNOWN"); break;
     }
 
@@ -146,7 +149,15 @@ TAC* generateCode(AST *node){
                      );
             break;
         case AST_ARRAY_PARAMS: result = tacJoin(code[3], tacJoin(tacCreate(TAC_PARAMS_NEW_FUN, node->son[0]->symbol, 0, 0), code[1])); break;
-        case AST_FUNCTION: result = tacJoin(tacCreate(TAC_CALL_FUN, makeTemp(), node->symbol, 0), code[0]); break;
+        case AST_FUNCTION: result = tacJoin(code[0], tacCreate(TAC_CALL_FUN, makeTemp(), node->symbol, 0)); break;
+        case AST_RETORNE: result = tacJoin(code[0], tacCreate(TAC_RET, code[0] ? code[0]->res : 0, 0, 0)); break;
+        case AST_ARRAY_PRINT: 
+            if (node->symbol)
+                result = tacJoin(tacCreate(TAC_PRINT, node->symbol, 0, 0), code[0]); 
+            else
+                result = tacJoin(tacJoin(code[0], tacCreate(TAC_PRINT, code[0] ? code[0]->res : 0, 0, 0)), code[1]); 
+            break;
+        case AST_ENTRADA: result = tacCreate(TAC_READ, makeTemp(), 0, 0); break;
         default: result = tacJoin(code[0], tacJoin(code[1], tacJoin(code[2], code[3])));
                  break;
     }

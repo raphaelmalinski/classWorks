@@ -31,6 +31,9 @@
 #define TAC_PARAMS_NEW_FUN 25
 #define TAC_CALL_FUN 26
 #define TAC_PARAM_CALL 27
+#define TAC_RET 28
+#define TAC_PRINT 29
+#define TAC_READ 30
 
 typedef struct tacNode {
     int type;
