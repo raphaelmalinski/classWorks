@@ -39,9 +39,15 @@ void tacPrint(TAC* tac) {
         case TAC_IFZ: fprintf(stderr, "TAC_IFZ"); break;
         case TAC_LABEL: fprintf(stderr, "TAC_LABEL"); break;
         case TAC_JUMP: fprintf(stderr, "TAC_JUMP"); break;
+        case TAC_NEW_ARRAY: fprintf(stderr, "TAC_NEW_ARRAY"); break;
+        case TAC_VAL_ARRAY: fprintf(stderr, "TAC_VAL_ARRAY"); break;
+        case TAC_MOVE_ARRAY: fprintf(stderr, "TAC_MOVE_ARRAY"); break;
+        case TAC_ARRAY: fprintf(stderr, "TAC_ARRAY"); break;
         case TAC_BEGINFUN: fprintf(stderr, "TAC_BEGINFUN"); break;
         case TAC_ENDFUN: fprintf(stderr, "TAC_ENDFUN"); break;
         case TAC_PARAMS_NEW_FUN: fprintf(stderr, "TAC_PARAMS_NEW_FUN"); break;
+        case TAC_CALL_FUN: fprintf(stderr, "TAC_CALL_FUN"); break;
+        case TAC_PARAM_CALL: fprintf(stderr, "TAC_PARAM_CALL"); break;
         default: fprintf(stderr, "TAC_UNKNOWN"); break;
     }
 
@@ -116,6 +122,15 @@ TAC* generateCode(AST *node){
             result = tacJoin(code[0], tacCreate(TAC_MOVE, node->symbol, code[0] ? code[0]->res : 0, 0)); break;
         case AST_SE: result = makeSe(code[0], code[1]); break;
         case AST_SE_SENAO: result = makeSeSenao(code[0], code[1], code[2]); break;
+        case AST_ATTR_ARRAY_INTE:
+        case AST_ATTR_ARRAY_CARA:
+        case AST_ATTR_ARRAY_REAL:
+            result = tacJoin(tacCreate(TAC_NEW_ARRAY, node->symbol, code[0] ? code[0]->res : 0, 0), code[1]); break;
+        case AST_ARRAY: result = tacJoin(tacCreate(TAC_VAL_ARRAY, code[0] ? code[0]->res : 0, 0, 0), code[1]); break;
+        case AST_ATTR_ARRAY: 
+            result = tacJoin(tacJoin(code[0], code[1]), tacCreate(TAC_MOVE_ARRAY, node->symbol, code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0));
+            break;
+        case AST_SYMBOL_ARRAY: result = tacJoin(code[0], tacCreate(TAC_ARRAY, makeTemp(), node->symbol, code[0] ? code[0]->res : 0)); break;
         case AST_FUNCTION_INTE:
         case AST_FUNCTION_CARA:
         case AST_FUNCTION_REAL:
@@ -131,6 +146,7 @@ TAC* generateCode(AST *node){
                      );
             break;
         case AST_ARRAY_PARAMS: result = tacJoin(code[3], tacJoin(tacCreate(TAC_PARAMS_NEW_FUN, node->son[0]->symbol, 0, 0), code[1])); break;
+        case AST_FUNCTION: result = tacJoin(tacCreate(TAC_CALL_FUN, makeTemp(), node->symbol, 0), code[0]); break;
         default: result = tacJoin(code[0], tacJoin(code[1], tacJoin(code[2], code[3])));
                  break;
     }
