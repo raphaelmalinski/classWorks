@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
   FILE *output;
 
   if (argc < 2) {
-    fprintf(stderr, "Call : etapa3 filename\n");
+    fprintf(stderr, "Call : etapa5 filename\n");
     exit(1);
   }
   
@@ -21,19 +21,11 @@ int main(int argc, char** argv) {
     fprintf(stderr, "Cannot open file %s\n", argv[1]);
     exit(2);
   }
-
-  // if(0 == (output = fopen(argv[2], "w"))) {
-  //   fprintf(stderr, "Cannot open file %s\n", argv[2]);
-  //   exit(3);
-  // }
   
   initMe();
 
   yyparse();
 
-  // descompila(astOutput, output);
-
   printf("SUPER SUCCESS!!! This is a program! \nFile had %d lines\n", lineNumber);
-  hashPrint();
   exit(0);
 }
