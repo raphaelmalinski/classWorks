@@ -255,6 +255,7 @@ TAC* tacReverse(TAC* tac) {
 void generateAsm(TAC* first) {
     TAC* tac;
     FILE *fout;
+    int numString = 1;
 
     fout = fopen("out.s", "w");
 
@@ -262,24 +263,37 @@ void generateAsm(TAC* first) {
     fprintf(fout, "##FIXED INIT\n"
     ".printintstr: .string \"%%d\\n\"\n"
     ".printstringstr: .string \"%%s\\n\"\n"
-    "\n");
+    "\n"
+    "\t.globl main\n"
+    "main:\n");
 
     // Each tac
     for (tac = first; tac; tac = tac->next) {
         switch (tac->type) {
             case TAC_BEGINFUN: fprintf(fout, "## TAC_BEGINFUN\n"
-                "\t.globl %s\n"
-                "%s: \n"
+                "\t.globl _%s\n"
+                "_%s: \n"
                 "\tpushq %%rbp\n"
                 "\tmovq	%%rsp, %%rbp\n", tac->res->text, tac->res->text); break;
             case TAC_ENDFUN: fprintf(fout, "##TAC_ENDFUN\n"
 	            "\tpopq	%%rbp\n"
                 "\tret\n"); break;
-            case TAC_PRINT: fprintf(fout, "##TAC_PRINT\n"
-	            "\tmovl	%s(%%rip), %%esi\n"
-	            "\tleaq	.printintstr(%%rip), %%rax\n"
-	            "\tmovq	%%rax, %%rdi\n"
-                "\tcall	printf\n", tac->res->text); break;
+            case TAC_PRINT: 
+                HASH *hash = hashFind(tac->res->text);
+                if (hash->type == SYMBOL_LIT_STRING) {
+                    fprintf(fout, "##TAC_PRINT\n"
+	                "\tleaq	_myString%d(%%rip), %%rax\n"
+                    "\tmovq	%%rax, %%rdi\n"
+                    "\tmovl	$0, %%eax\n"
+                    "\tcall	printf\n", numString++);
+                } else {
+                    fprintf(fout, "##TAC_PRINT\n"
+	                "\tmovl	_%s(%%rip), %%esi\n"
+	                "\tleaq	.printintstr(%%rip), %%rax\n"
+	                "\tmovq	%%rax, %%rdi\n"
+                    "\tcall	printf\n", tac->res->text);
+                }
+                break;
         }
     }
 
