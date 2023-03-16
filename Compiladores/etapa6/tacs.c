@@ -263,16 +263,14 @@ void generateAsm(TAC* first) {
     fprintf(fout, "##FIXED INIT\n"
     ".printintstr: .string \"%%d\\n\"\n"
     ".printstringstr: .string \"%%s\\n\"\n"
-    "\n"
-    "\t.globl main\n"
-    "main:\n");
+    "\n");
 
     // Each tac
     for (tac = first; tac; tac = tac->next) {
         switch (tac->type) {
             case TAC_BEGINFUN: fprintf(fout, "## TAC_BEGINFUN\n"
-                "\t.globl _%s\n"
-                "_%s: \n"
+                "\t.globl %s\n"
+                "%s: \n"
                 "\tpushq %%rbp\n"
                 "\tmovq	%%rsp, %%rbp\n", tac->res->text, tac->res->text); break;
             case TAC_ENDFUN: fprintf(fout, "##TAC_ENDFUN\n"
