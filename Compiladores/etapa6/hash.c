@@ -89,7 +89,7 @@ void printAsm(FILE *fout) {
         fprintf(fout, "_%s:\t.long\t0\n", node->text);
       } 
       else if(node->type == SYMBOL_LIT_INTE || node->type == SYMBOL_LIT_CARA || node->type == SYMBOL_LIT_REAL) {
-        fprintf(fout, "_%s:\t.long\t%s\n", node->text, node->text);
+        fprintf(fout, "\t.bss\n_%s:\t.zero\t%s\n", node->text, node->text);
       } 
       else if(node->type == SYMBOL_LIT_STRING) {
         fprintf(fout, "_myString%d:\n\t.string\t%s\n\t.text\n", numString++, node->text);

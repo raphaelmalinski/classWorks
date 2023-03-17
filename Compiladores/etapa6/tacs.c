@@ -252,6 +252,16 @@ TAC* tacReverse(TAC* tac) {
     return t;
 }
 
+void makeBinAsmOperation(FILE *fout, TAC *tac, char *op) {
+    if (!tac) return;
+
+    fprintf(fout, "\tmovl _%s(%%rip), %%edx\n", tac->op1->text);
+    fprintf(fout, "\tmovl _%s(%%rip), %%eax\n", tac->op2->text);
+    fprintf(fout, "\t%sl %%edx, %%eax\n", op);
+    fprintf(fout, "\tmovl %%eax, _%s(%%rip)\n", tac->res->text);
+    fprintf(fout, "\tmovl $0, %%eax\n");
+}
+
 void generateAsm(TAC* first) {
     TAC* tac;
     FILE *fout;
@@ -292,6 +302,7 @@ void generateAsm(TAC* first) {
                     "\tcall	printf\n", tac->res->text);
                 }
                 break;
+            case TAC_ADD: fprintf(fout, "##TAC_ADD\n"); makeBinAsmOperation(fout, tac, "add"); break;
         }
     }
 
