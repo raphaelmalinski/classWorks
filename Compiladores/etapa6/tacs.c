@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "tacs.h"
 
+extern HASH *Table[HASH_SIZE];
+
 TAC* tacCreate(int type, HASH* res, HASH* op1, HASH* op2) {
     TAC* newtac = 0;
     newtac = (TAC*) calloc(1, sizeof(TAC));
@@ -25,6 +27,7 @@ void tacPrint(TAC* tac) {
         case TAC_ADD: fprintf(stderr, "TAC_ADD"); break;
         case TAC_SUB: fprintf(stderr, "TAC_SUB"); break;
         case TAC_MOVE: fprintf(stderr, "TAC_MOVE"); break;
+        case TAC_VAR_DEC: fprintf(stderr, "TAC_VAR_DEC"); break;
         case TAC_MUL: fprintf(stderr, "TAC_MUL"); break;
         case TAC_DIV: fprintf(stderr, "TAC_DIV"); break;
         case TAC_LESS: fprintf(stderr, "TAC_LESS"); break;
@@ -120,10 +123,11 @@ TAC* generateCode(AST *node){
         case AST_OR: result = makeBinOperation(TAC_OR, code); break;
         case AST_NOT: result = tacJoin(code[0], tacCreate(TAC_NOT, makeTemp(), code[0] ? code[0]->res : 0, 0)); break;
         case AST_ATTR:
+            result = tacJoin(code[0], tacCreate(TAC_MOVE, node->symbol, code[0] ? code[0]->res : 0, 0)); break;
         case AST_ATTR_CARA:
         case AST_ATTR_INTE:
         case AST_ATTR_REAL:
-            result = tacJoin(code[0], tacCreate(TAC_MOVE, node->symbol, code[0] ? code[0]->res : 0, 0)); break;
+            result = tacJoin(code[0], tacCreate(TAC_VAR_DEC, node->symbol, code[0] ? code[0]->res : 0, 0)); break;
         case AST_SE: result = makeSe(code[0], code[1]); break;
         case AST_SE_SENAO: result = makeSeSenao(code[0], code[1], code[2]); break;
         case AST_ENQUANTO: result = makeEnquanto(code[0], code[1]); break;
@@ -243,6 +247,41 @@ TAC* makeEnquanto(TAC* code0, TAC* code1) {
 
 // ASM GENERATION
 
+TAC* findVariableTac(TAC *tac) {
+    for (; tac; tac = tac->next) {
+        if (tac->type == TAC_VAR_DEC)
+            return tac;
+    }
+    return 0;
+}
+
+void printAsm(FILE *fout, TAC *tac) {
+  int i = 0;
+  int numString = 1;
+  HASH*node;
+  TAC *variableDec;
+
+  fprintf(fout, "## DATA SECTION\n"
+	              "\t.section	.data\n\n");
+
+  for(i = 0; i < HASH_SIZE; ++i)
+    for(node = Table[i]; node; node = node->next) {
+      if(node->type == SYMBOL_VARIABLE || node->type == SYMBOL_IDENTIFIER) {
+        variableDec = findVariableTac(tac);
+        if (variableDec && variableDec->res->text == node->text)
+            fprintf(fout, "_%s:\t.long\t%s\n", node->text, variableDec->op1->text);
+        else 
+            fprintf(fout, "_%s:\t.long\t0\n", node->text);
+      } 
+      else if(node->type == SYMBOL_LIT_INTE || node->type == SYMBOL_LIT_CARA || node->type == SYMBOL_LIT_REAL) {
+        fprintf(fout, "_%s:\t.long\t%s\n", node->text, node->text);
+      } 
+      else if(node->type == SYMBOL_LIT_STRING) {
+        fprintf(fout, "_myString%d:\n\t.string\t%s\n\t.text\n", numString++, node->text);
+      }
+    }
+}
+
 TAC* tacReverse(TAC* tac) {
     TAC* t = tac;
     
@@ -259,7 +298,6 @@ void makeBinAsmOperation(FILE *fout, TAC *tac, char *op) {
     fprintf(fout, "\tmovl _%s(%%rip), %%eax\n", tac->op2->text);
     fprintf(fout, "\t%sl %%edx, %%eax\n", op);
     fprintf(fout, "\tmovl %%eax, _%s(%%rip)\n", tac->res->text);
-    fprintf(fout, "\tmovl $0, %%eax\n");
 }
 
 void generateAsm(TAC* first) {
@@ -303,11 +341,16 @@ void generateAsm(TAC* first) {
                 }
                 break;
             case TAC_ADD: fprintf(fout, "##TAC_ADD\n"); makeBinAsmOperation(fout, tac, "add"); break;
+
+            case TAC_MOVE: fprintf(fout, "##TAC_MOVE\n"
+                            "\tmovl _%s(%%rip), %%eax\n"
+                            "\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, tac->res->text); 
+                break;
         }
     }
 
     // Hash Table
-    printAsm(fout);
+    printAsm(fout, first);
 
     fclose(fout);
 }

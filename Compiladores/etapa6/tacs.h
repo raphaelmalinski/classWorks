@@ -34,7 +34,7 @@
 #define TAC_RET 28
 #define TAC_PRINT 29
 #define TAC_READ 30
-
+#define TAC_VAR_DEC 31
 typedef struct tacNode {
     int type;
     HASH * res;
@@ -59,5 +59,6 @@ TAC* generateCode(AST *node);
 TAC* tacReverse(TAC* tac);
 void makeBinAsmOperation(FILE *fout, TAC *tac, char *op);
 void generateAsm(TAC* first);
+void printAsm(FILE *fout, TAC *tac);
 
 #endif

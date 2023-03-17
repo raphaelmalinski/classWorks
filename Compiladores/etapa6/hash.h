@@ -26,8 +26,6 @@ void hashPrint(void);
 HASH* makeTemp(void);
 HASH* makeLabel(void);
 
-void printAsm(FILE *fout);
-
 #endif
 
 // END OF FILE

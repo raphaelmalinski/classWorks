@@ -74,25 +74,3 @@ HASH* makeLabel(void) {
   sprintf(buffer, "mYLabule%d", serial++);
   return hashInsert(SYMBOL_LABEL, buffer);
 }
-
-void printAsm(FILE *fout) {
-  int i = 0;
-  int numString = 1;
-  HASH*node;
-
-  fprintf(fout, "## DATA SECTION\n"
-	              "\t.section	.rodata\n\n");
-
-  for(i = 0; i < HASH_SIZE; ++i)
-    for(node = Table[i]; node; node = node->next) {
-      if(node->type == SYMBOL_VARIABLE || node->type == SYMBOL_IDENTIFIER) {
-        fprintf(fout, "_%s:\t.long\t0\n", node->text);
-      } 
-      else if(node->type == SYMBOL_LIT_INTE || node->type == SYMBOL_LIT_CARA || node->type == SYMBOL_LIT_REAL) {
-        fprintf(fout, "\t.bss\n_%s:\t.zero\t%s\n", node->text, node->text);
-      } 
-      else if(node->type == SYMBOL_LIT_STRING) {
-        fprintf(fout, "_myString%d:\n\t.string\t%s\n\t.text\n", numString++, node->text);
-      }
-    }
-}
