@@ -58,6 +58,7 @@ TAC* generateCode(AST *node);
 
 TAC* tacReverse(TAC* tac);
 void makeBinAsmOperation(FILE *fout, TAC *tac, char *op);
+void makeBinAsmBoolOperation(FILE *fout, TAC *tac, char *op);
 void generateAsm(TAC* first);
 void printAsm(FILE *fout, TAC *tac);
 

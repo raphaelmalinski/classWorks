@@ -300,6 +300,17 @@ void makeBinAsmOperation(FILE *fout, TAC *tac, char *op) {
                   "\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, tac->op2->text, op, tac->res->text);
 }
 
+void makeBinAsmBoolOperation(FILE *fout, TAC *tac, char *op) {
+    if (!tac) return;
+
+    fprintf(fout, "\tmovl _%s(%%rip), %%edx\n"
+                  "\tmovl _%s(%%rip), %%eax\n"
+                  "\tcmpl %%eax, %%edx\n"
+                  "\t%s %%al\n"
+                  "\tmovzbl %%al, %%eax\n"
+                  "\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, tac->op2->text, op, tac->res->text);
+}
+
 void generateAsm(TAC* first) {
     TAC* tac;
     FILE *fout;
@@ -350,6 +361,12 @@ void generateAsm(TAC* first) {
                                         "\tidivl %%ecx\n"
                                         "\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, tac->op2->text, tac->res->text);
                         break;
+            case TAC_GREATER: fprintf(fout, "##TAC_GREATER\n"); makeBinAsmBoolOperation(fout, tac, "setg"); break;
+            case TAC_LESS: fprintf(fout, "##TAC_LESS\n"); makeBinAsmBoolOperation(fout, tac, "setl"); break;
+            case TAC_GE: fprintf(fout, "##TAC_GE\n"); makeBinAsmBoolOperation(fout, tac, "setge"); break;
+            case TAC_LE: fprintf(fout, "##TAC_LE\n"); makeBinAsmBoolOperation(fout, tac, "setle"); break;
+            case TAC_EQ: fprintf(fout, "##TAC_EQ\n"); makeBinAsmBoolOperation(fout, tac, "sete"); break;
+            case TAC_DIF: fprintf(fout, "##TAC_DIF\n"); makeBinAsmBoolOperation(fout, tac, "setne"); break;
             case TAC_MOVE: fprintf(fout, "##TAC_MOVE\n"
                             "\tmovl _%s(%%rip), %%eax\n"
                             "\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, tac->res->text); 
