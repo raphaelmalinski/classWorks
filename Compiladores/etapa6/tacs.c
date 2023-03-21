@@ -294,10 +294,10 @@ TAC* tacReverse(TAC* tac) {
 void makeBinAsmOperation(FILE *fout, TAC *tac, char *op) {
     if (!tac) return;
 
-    fprintf(fout, "\tmovl _%s(%%rip), %%eax\n", tac->op1->text);
-    fprintf(fout, "\tmovl _%s(%%rip), %%edx\n", tac->op2->text);
-    fprintf(fout, "\t%sl %%edx, %%eax\n", op);
-    fprintf(fout, "\tmovl %%eax, _%s(%%rip)\n", tac->res->text);
+    fprintf(fout, "\tmovl _%s(%%rip), %%eax\n"
+                  "\tmovl _%s(%%rip), %%edx\n"
+                  "\t%sl %%edx, %%eax\n"
+                  "\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, tac->op2->text, op, tac->res->text);
 }
 
 void generateAsm(TAC* first) {
@@ -343,7 +343,13 @@ void generateAsm(TAC* first) {
             case TAC_ADD: fprintf(fout, "##TAC_ADD\n"); makeBinAsmOperation(fout, tac, "add"); break;
             case TAC_SUB: fprintf(fout, "##TAC_SUB\n"); makeBinAsmOperation(fout, tac, "sub"); break;
             case TAC_MUL: fprintf(fout, "##TAC_MUL\n"); makeBinAsmOperation(fout, tac, "imul"); break;
-
+            case TAC_DIV: fprintf(fout, "##TAC_DIV\n" 
+                                        "\tmovl _%s(%%rip), %%eax\n"
+                                        "\tmovl _%s(%%rip), %%ecx\n"
+                                        "\tcltd\n"
+                                        "\tidivl %%ecx\n"
+                                        "\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, tac->op2->text, tac->res->text);
+                        break;
             case TAC_MOVE: fprintf(fout, "##TAC_MOVE\n"
                             "\tmovl _%s(%%rip), %%eax\n"
                             "\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, tac->res->text); 
