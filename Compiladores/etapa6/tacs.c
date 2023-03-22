@@ -401,6 +401,14 @@ void generateAsm(TAC* first) {
                                                                       numLabelsAndOr, numLabelsAndOr+2, numLabelsAndOr+1, numLabelsAndOr+2, tac->res->text);
                 numLabelsAndOr += 2;
                 break;
+            case TAC_NOT: fprintf(fout, "##TAC_NOT\n"
+                                        "\tmovl _%s(%%rip), %%eax\n"
+                                        "\ttestl %%eax, %%eax\n"
+                                        "\tsete %%al\n"
+                                        "\tmovzbl %%al, %%eax\n"
+                                        "\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, tac->res->text);
+                numLabelsAndOr += 2;
+                break;
             case TAC_MOVE: fprintf(fout, "##TAC_MOVE\n"
                             "\tmovl _%s(%%rip), %%eax\n"
                             "\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, tac->res->text); 
