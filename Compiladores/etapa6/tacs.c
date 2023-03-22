@@ -315,6 +315,7 @@ void generateAsm(TAC* first) {
     TAC* tac;
     FILE *fout;
     int numString = 1;
+    int numLabelsAndOr = 1;
 
     fout = fopen("out.s", "w");
 
@@ -360,13 +361,46 @@ void generateAsm(TAC* first) {
                                         "\tcltd\n"
                                         "\tidivl %%ecx\n"
                                         "\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, tac->op2->text, tac->res->text);
-                        break;
+                break;
             case TAC_GREATER: fprintf(fout, "##TAC_GREATER\n"); makeBinAsmBoolOperation(fout, tac, "setg"); break;
             case TAC_LESS: fprintf(fout, "##TAC_LESS\n"); makeBinAsmBoolOperation(fout, tac, "setl"); break;
             case TAC_GE: fprintf(fout, "##TAC_GE\n"); makeBinAsmBoolOperation(fout, tac, "setge"); break;
             case TAC_LE: fprintf(fout, "##TAC_LE\n"); makeBinAsmBoolOperation(fout, tac, "setle"); break;
             case TAC_EQ: fprintf(fout, "##TAC_EQ\n"); makeBinAsmBoolOperation(fout, tac, "sete"); break;
             case TAC_DIF: fprintf(fout, "##TAC_DIF\n"); makeBinAsmBoolOperation(fout, tac, "setne"); break;
+            case TAC_AND: fprintf(fout, "##TAC_AND\n"
+                                        "\tmovl _%s(%%rip), %%eax\n"
+                                        "\ttestl %%eax, %%eax\n"
+                                        "\tje .L%d\n"
+                                        "\tmovl _%s(%%rip), %%eax\n"
+                                        "\ttestl %%eax, %%eax\n"
+                                        "\tje .L%d\n"
+                                        "\tmovl $1, %%eax\n"
+                                        "\tjmp .L%d\n"
+                                        ".L%d:\n"
+                                        "\tmovl $0, %%eax\n"
+                                        ".L%d:\n"
+                                        "\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, numLabelsAndOr, tac->op2->text, numLabelsAndOr,
+                                                                      numLabelsAndOr+1, numLabelsAndOr, numLabelsAndOr+1, tac->res->text);
+                numLabelsAndOr += 2;
+                break;
+            case TAC_OR: fprintf(fout, "##TAC_OR\n"
+                                        "\tmovl _%s(%%rip), %%eax\n"
+                                        "\ttestl %%eax, %%eax\n"
+                                        "\tjne .L%d\n"
+                                        "\tmovl _%s(%%rip), %%eax\n"
+                                        "\ttestl %%eax, %%eax\n"
+                                        "\tje .L%d\n"
+                                        ".L%d:\n"
+                                        "\tmovl $1, %%eax\n"
+                                        "\tjmp .L%d\n"
+                                        ".L%d:\n"
+                                        "\tmovl $0, %%eax\n"
+                                        ".L%d:\n"
+                                        "\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, numLabelsAndOr, tac->op2->text, numLabelsAndOr+1,
+                                                                      numLabelsAndOr, numLabelsAndOr+2, numLabelsAndOr+1, numLabelsAndOr+2, tac->res->text);
+                numLabelsAndOr += 2;
+                break;
             case TAC_MOVE: fprintf(fout, "##TAC_MOVE\n"
                             "\tmovl _%s(%%rip), %%eax\n"
                             "\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, tac->res->text); 
