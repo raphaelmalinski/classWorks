@@ -257,14 +257,14 @@ TAC* findVariableTac(TAC *tac) {
 
 void printAsm(FILE *fout, TAC *tac) {
   int i = 0;
-  int numString = 1;
+  int numOfStrings = 0;
   HASH*node;
   TAC *variableDec;
 
   fprintf(fout, "## DATA SECTION\n"
 	              "\t.section	.data\n\n");
 
-  for(i = 0; i < HASH_SIZE; ++i)
+  for(i = 0; i < HASH_SIZE; ++i) {
     for(node = Table[i]; node; node = node->next) {
       if(node->type == SYMBOL_VARIABLE || node->type == SYMBOL_IDENTIFIER) {
         variableDec = findVariableTac(tac);
@@ -277,9 +277,18 @@ void printAsm(FILE *fout, TAC *tac) {
         fprintf(fout, "_%s:\t.long\t%s\n", node->text, node->text);
       } 
       else if(node->type == SYMBOL_LIT_STRING) {
-        fprintf(fout, "_myString%d:\n\t.string\t%s\n\t.text\n", numString++, node->text);
+        numOfStrings++;
       }
     }
+  }
+
+  for(i = 0; i < HASH_SIZE; ++i) {
+    for(node = Table[i]; node; node = node->next) {
+      if(node->type == SYMBOL_LIT_STRING) {
+        fprintf(fout, "_myString%d:\n\t.string\t%s\n\t.text\n", numOfStrings--, node->text);
+      }
+    }
+  }
 }
 
 TAC* tacReverse(TAC* tac) {
@@ -420,6 +429,17 @@ void generateAsm(TAC* first) {
                                          "\tmovl $0, %%eax\n"
                                          "\tcall __isoc99_scanf\n", tac->res->text);
                 break;
+            case TAC_LABEL: fprintf(fout, "##TAC_LABEL\n"
+                                          ".%s:\n", tac->res->text);
+                break;
+            case TAC_IFZ: fprintf(fout, "##TAC_IFZ\n"
+                                        "\tmovl	_%s(%%rip), %%eax\n"
+                                        "\ttestl %%eax, %%eax\n"
+                                        "\tje .%s\n", tac->op1->text, tac->res->text);
+                break;
+            case TAC_JUMP: fprintf(fout, "##TAC_JUMP\n"
+                                         "\tjmp .%s\n", tac->res->text);
+                break;   
         }
     }
 
