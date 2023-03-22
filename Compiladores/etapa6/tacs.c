@@ -322,7 +322,7 @@ void generateAsm(TAC* first) {
     // Init
     fprintf(fout, "##FIXED INIT\n"
     ".printintstr: .string \"%%d\\n\"\n"
-    ".printstringstr: .string \"%%s\\n\"\n"
+    ".scanfintstr: .string \"%%d\"\n"
     "\n");
 
     // Each tac
@@ -407,11 +407,18 @@ void generateAsm(TAC* first) {
                                         "\tsete %%al\n"
                                         "\tmovzbl %%al, %%eax\n"
                                         "\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, tac->res->text);
-                numLabelsAndOr += 2;
                 break;
             case TAC_MOVE: fprintf(fout, "##TAC_MOVE\n"
                             "\tmovl _%s(%%rip), %%eax\n"
                             "\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, tac->res->text); 
+                break;
+            case TAC_READ: fprintf(fout, "##TAC_READ\n"
+                                         "\tleaq _%s(%%rip), %%rax\n"
+                                         "\tmovq %%rax, %%rsi\n"
+                                         "\tleaq .scanfintstr(%%rip), %%rax\n"
+                                         "\tmovq %%rax, %%rdi\n"
+                                         "\tmovl $0, %%eax\n"
+                                         "\tcall __isoc99_scanf\n", tac->res->text);
                 break;
         }
     }
