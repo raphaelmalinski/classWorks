@@ -461,10 +461,13 @@ void generateAsm(TAC* first) {
             case TAC_JUMP: fprintf(fout, "##TAC_JUMP\n"
                                          "\tjmp .%s\n", tac->res->text);
                 break;   
-            case TAC_VAL_ARRAY: fprintf(fout, "##TAC_VAL_ARRAY\n");
+            case TAC_VAL_ARRAY: fprintf(fout, "##TAC_VAL_ARRAY\n"
+                                              "\tmovl _%s(%%rip), %%eax\n"
+                                              "\tmovl %%eax, _%s(%%rip)\n", tac->res->text, tac->op1->text); 
                 break;
             case TAC_CALL_FUN: fprintf(fout, "##TAC_CALL_FUN\n"
-                                             "\t\n");
+                                             "\tcall %s\n"
+                                             "\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, tac->res->text);
                 break;
         }
     }
