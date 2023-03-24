@@ -143,7 +143,11 @@ TAC* generateCode(AST *node){
         case AST_ATTR_ARRAY_INTE:
         case AST_ATTR_ARRAY_CARA:
         case AST_ATTR_ARRAY_REAL:
-            result = tacJoin(tacCreate(TAC_NEW_ARRAY, node->symbol, code[0] ? code[0]->res : 0, 0), code[1]); break;
+            HASH *arrayName = tacCreate(TAC_SYMBOL, node->symbol, 0, 0)->res;
+            result = tacJoin(tacCreate(TAC_NEW_ARRAY, node->symbol, code[0] ? code[0]->res : 0, 0), code[1]); 
+            HASH *hashArray = hashFind(arrayName->text);
+            hashArray->type = SYMBOL_ARRAY;
+            break;
         case AST_ARRAY: 
             if (node->symbol != 0){
                 HASH *referenceFunction = hashFind(node->symbol->text);
@@ -154,8 +158,12 @@ TAC* generateCode(AST *node){
                 HASH *param = hashFind(referenceFunction->params[iParam--]);
                 result = tacJoin(tacCreate(TAC_VAL_ARRAY, code[0] ? code[0]->res : 0, param, 0), code[1]);
             }
-            else
-                result = tacJoin(tacCreate(TAC_VAL_ARRAY, code[0] ? code[0]->res : 0, 0, 0), code[1]);
+            else {
+                if (node->son[0]->type == AST_SYMBOL)
+                    result = tacJoin(tacCreate(TAC_VAL_ARRAY, code[0] ? code[0]->res : 0, 0, 0), code[1]);
+                else    
+                    result = tacJoin(tacCreate(TAC_VAL_ARRAY, code[0] ? code[0]->res : 0, 0, 0), code[1]);
+            }
             break;
         case AST_ATTR_ARRAY: 
             result = tacJoin(tacJoin(code[0], code[1]), tacCreate(TAC_MOVE_ARRAY, node->symbol, code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0));
@@ -461,19 +469,49 @@ void generateAsm(TAC* first) {
             case TAC_JUMP: fprintf(fout, "##TAC_JUMP\n"
                                          "\tjmp .%s\n", tac->res->text);
                 break;   
-            case TAC_VAL_ARRAY: fprintf(fout, "##TAC_VAL_ARRAY\n"
-                                              "\tmovl _%s(%%rip), %%eax\n"
-                                              "\tmovl %%eax, _%s(%%rip)\n", tac->res->text, tac->op1->text); 
+            case TAC_VAL_ARRAY: 
+                if (tac->op1) {
+                    fprintf(fout, "##TAC_VAL_ARRAY\n"
+                                  "\tmovl _%s(%%rip), %%eax\n"
+                                  "\tmovl %%eax, _%s(%%rip)\n", tac->res->text, tac->op1->text); 
+                }
                 break;
             case TAC_CALL_FUN: fprintf(fout, "##TAC_CALL_FUN\n"
                                              "\tcall %s\n"
                                              "\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, tac->res->text);
+                break;
+            case TAC_MOVE_ARRAY: fprintf(fout, "##TAC_MOVE_ARRAY\n"
+                                               "\tmovl _%s(%%rip), %%eax\n"
+                                               "\tmovl %%eax, %d+_%s(%%rip)\n", tac->op2->text, atoi(tac->op1->text)*4, tac->res->text); 
+                break;
+            case TAC_ARRAY: fprintf(fout, "##TAC_ARRAY\n"
+                                               "\tmovl %d+_%s(%%rip), %%eax\n"
+                                               "\tmovl %%eax, _%s(%%rip)\n", atoi(tac->op2->text)*4, tac->op1->text, tac->res->text); 
                 break;
         }
     }
 
     // Hash Table
     printAsm(fout, first);
+
+    int newArray = 0;
+    for (tac = first; tac; tac = tac->next) {
+        switch (tac->type) {
+            case TAC_NEW_ARRAY: 
+                newArray = 1;
+                fprintf(fout, "##TAC_NEW_ARRAY\n"
+                              "\t.size  %s, %d\n"
+                              "_%s:\n", tac->res->text, atoi(tac->op1->text)*4, tac->res->text);
+                break;
+            case TAC_VAL_ARRAY:
+                if (newArray) {
+                    fprintf(fout, "\t.long %s\n", tac->res->text);
+                }
+                break;
+            default:
+                newArray = 0;
+        }
+    }
 
     fclose(fout);
 }

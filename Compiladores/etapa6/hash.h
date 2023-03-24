@@ -11,6 +11,7 @@
 #define SYMBOL_LABEL 6
 #define SYMBOL_IDENTIFIER 7
 #define SYMBOL_FUNCTION 8
+#define SYMBOL_ARRAY 8
 
 typedef struct hash_node {
     int type;

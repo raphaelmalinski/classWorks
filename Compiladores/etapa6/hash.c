@@ -56,10 +56,6 @@ void hashPrint(void) {
   for(i = 0; i < HASH_SIZE; ++i)
     for(node = Table[i]; node; node = node->next) {
       printf("Table[%d] has %s - %d\n", i, node->text, node->type);
-      if (node->type == SYMBOL_FUNCTION) {
-        for (int j = 0; j<4; j++)
-          printf("\tParam - %s\n", node->params[j]);
-      }
     }
 }
 
