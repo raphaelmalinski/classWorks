@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "ast.h"
 
 AST * astCreate(int type, HASH * symbol, AST* son0, AST* son1, AST* son2, AST* son3) {
@@ -14,10 +15,11 @@ AST * astCreate(int type, HASH * symbol, AST* son0, AST* son1, AST* son2, AST* s
     return newnode;
 }
 
-void astPrint(AST* node, int level) {
+void astPrint(AST* node, int level, char *functionName, char *newFunction, int iParam) {
     if(!node) return;
 
     int i;
+    HASH *nodeFunction;
 
     for (i = 0; i < level; ++i)
         fprintf(stderr, "  ");
@@ -71,14 +73,30 @@ void astPrint(AST* node, int level) {
     }
 
     if(node->symbol != 0) {
+        if (node->type == AST_FUNCTION)
+            functionName = node->symbol->text;
+
+        if (node->type == AST_FUNCTION_INTE || node->type == AST_FUNCTION_CARA || node->type == AST_FUNCTION_REAL) {
+            newFunction = node->symbol->text;
+        }
+
+        fprintf(stderr, ", %s)\n", node->symbol->text);
+    }
+    else if(node->type == AST_ARRAY && strcmp(functionName, "")) {
+        node->symbol = hashFind(functionName);
         fprintf(stderr, ", %s)\n", node->symbol->text);
     }
     else {
         fprintf(stderr, ", 0)\n");
+        
+        if (node->type == AST_ARRAY_PARAMS) {
+            nodeFunction = hashFind(newFunction);
+            strcpy(nodeFunction->params[iParam++], node->son[0]->symbol->text);
+        }
     }
 
     for(i=0; i < MAX_SONS; ++i) {
-        astPrint(node->son[i], level+1);
+        astPrint(node->son[i], level+1, functionName, newFunction, iParam);
     }
 }
 

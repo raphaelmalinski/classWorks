@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "tacs.h"
 
 extern HASH *Table[HASH_SIZE];
@@ -94,6 +95,14 @@ TAC* makeBinOperation(int op, TAC* code[MAX_SONS]) {
     return tacJoin(tacJoin(code[0], code[1]), tacCreate(op, makeTemp(), code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0));
 }
 
+int strListSize(char strList[100][50], int index) {
+    if (strlen(strList[index]) == 0) 
+        return 0;
+
+    return 1 + strListSize(strList, ++index);
+}
+
+int iParam = -1;
 TAC* generateCode(AST *node){
     int i;
     TAC *result = 0;
@@ -135,7 +144,19 @@ TAC* generateCode(AST *node){
         case AST_ATTR_ARRAY_CARA:
         case AST_ATTR_ARRAY_REAL:
             result = tacJoin(tacCreate(TAC_NEW_ARRAY, node->symbol, code[0] ? code[0]->res : 0, 0), code[1]); break;
-        case AST_ARRAY: result = tacJoin(tacCreate(TAC_VAL_ARRAY, code[0] ? code[0]->res : 0, 0, 0), code[1]); break;
+        case AST_ARRAY: 
+            if (node->symbol != 0){
+                HASH *referenceFunction = hashFind(node->symbol->text);
+
+                if (iParam < 0)
+                    iParam = strListSize(referenceFunction->params, 0)-1;
+
+                HASH *param = hashFind(referenceFunction->params[iParam--]);
+                result = tacJoin(tacCreate(TAC_VAL_ARRAY, code[0] ? code[0]->res : 0, param, 0), code[1]);
+            }
+            else
+                result = tacJoin(tacCreate(TAC_VAL_ARRAY, code[0] ? code[0]->res : 0, 0, 0), code[1]);
+            break;
         case AST_ATTR_ARRAY: 
             result = tacJoin(tacJoin(code[0], code[1]), tacCreate(TAC_MOVE_ARRAY, node->symbol, code[0] ? code[0]->res : 0, code[1] ? code[1]->res : 0));
             break;
@@ -158,7 +179,7 @@ TAC* generateCode(AST *node){
             hash->type = SYMBOL_FUNCTION;
             break;
         case AST_ARRAY_PARAMS: result = tacJoin(code[3], tacJoin(tacCreate(TAC_PARAMS_NEW_FUN, node->son[0]->symbol, 0, 0), code[1])); break;
-        case AST_FUNCTION: result = tacJoin(code[0], tacCreate(TAC_CALL_FUN, makeTemp(), node->symbol, 0)); break;
+        case AST_FUNCTION: iParam = -1; result = tacJoin(code[0], tacCreate(TAC_CALL_FUN, makeTemp(), node->symbol, 0)); break;
         case AST_RETORNE: result = tacJoin(code[0], tacCreate(TAC_RET, code[0] ? code[0]->res : 0, 0, 0)); break;
         case AST_ARRAY_PRINT: 
             if (node->symbol)
@@ -440,6 +461,11 @@ void generateAsm(TAC* first) {
             case TAC_JUMP: fprintf(fout, "##TAC_JUMP\n"
                                          "\tjmp .%s\n", tac->res->text);
                 break;   
+            case TAC_VAL_ARRAY: fprintf(fout, "##TAC_VAL_ARRAY\n");
+                break;
+            case TAC_CALL_FUN: fprintf(fout, "##TAC_CALL_FUN\n"
+                                             "\t\n");
+                break;
         }
     }
 

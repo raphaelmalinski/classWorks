@@ -56,7 +56,7 @@ typedef struct ast_node {
 } AST;
 
 AST * astCreate(int type, HASH * symbol, AST* son0, AST* son1, AST* son2, AST* son3);
-void astPrint(AST* node, int level);
+void astPrint(AST* node, int level, char *functionName, char *newFunction, int iParam);
 void descompila(AST* node, FILE * output);
 
 #endif

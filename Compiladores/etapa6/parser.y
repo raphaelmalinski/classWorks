@@ -71,7 +71,7 @@ extern int lineNumber;
 
 program: block              { TAC* code;
                               astOutput = $1;
-                              astPrint($1, 0);
+                              astPrint($1, 0, "", "", 0);
                               code = generateCode($1);
                               tacPrintBackwards(code);
                               code = tacReverse(code);
@@ -79,7 +79,7 @@ program: block              { TAC* code;
                               $$ = $1;  }
          | listDeclarations { TAC* code;
                               astOutput = $1;
-                              astPrint($1, 0);
+                              astPrint($1, 0, "", "", 0);
                               code = generateCode($1);
                               tacPrintBackwards(code);
                               code = tacReverse(code);
