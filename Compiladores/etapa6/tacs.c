@@ -310,14 +310,6 @@ void printAsm(FILE *fout, TAC *tac) {
       }
     }
   }
-
-  for(i = 0; i < HASH_SIZE; ++i) {
-    for(node = Table[i]; node; node = node->next) {
-      if(node->type == SYMBOL_LIT_STRING) {
-        fprintf(fout, "_myString%d:\n\t.string\t%s\n\t.text\n", numOfStrings--, node->text);
-      }
-    }
-  }
 }
 
 TAC* tacReverse(TAC* tac) {
@@ -377,6 +369,7 @@ void generateAsm(TAC* first) {
             case TAC_PRINT: 
                 HASH *hash = hashFind(tac->res->text);
                 if (hash->type == SYMBOL_LIT_STRING) {
+                    printf("\n%s - %d\n", tac->res->text, numString);
                     fprintf(fout, "##TAC_PRINT\n"
 	                "\tleaq	_myString%d(%%rip), %%rax\n"
                     "\tmovq	%%rax, %%rdi\n"
@@ -494,6 +487,20 @@ void generateAsm(TAC* first) {
     // Hash Table
     printAsm(fout, first);
 
+    numString = 1;
+    for (tac = first; tac; tac = tac->next) {
+        switch (tac->type) {
+            case TAC_PRINT:
+                HASH *hash = hashFind(tac->res->text);
+                if (hash->type == SYMBOL_LIT_STRING) {
+                    fprintf(fout, "_myString%d:\n"
+	                            "\t.string %s\n"
+	                            "\t.text\n" , numString++, tac->res->text);
+                }
+                break;
+        }
+    }
+    
     int newArray = 0;
     for (tac = first; tac; tac = tac->next) {
         switch (tac->type) {
