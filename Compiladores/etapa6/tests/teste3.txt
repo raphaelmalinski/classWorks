@@ -1,0 +1,25 @@
+inte a[10];
+inte b[10] 9 8 7 6 5 4 3 2 1 0;
+
+inte main() {
+    a[0] = b[0] *2;
+    a[1] = b[1] *2;
+    a[2] = b[2] *2;
+    a[3] = b[3] *2;
+    a[4] = b[4] *2;
+    a[5] = b[5] *2;
+    a[6] = b[6] *2;
+    a[7] = b[7] *2;
+    a[8] = b[8] *2;
+    a[9] = b[9] *2;
+    escreva a[0];
+    escreva a[1];
+    escreva a[2];
+    escreva a[3];
+    escreva a[4];
+    escreva a[5];
+    escreva a[6];
+    escreva a[7];
+    escreva a[8];
+    escreva a[9];
+}

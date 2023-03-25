@@ -291,7 +291,8 @@ void printAsm(FILE *fout, TAC *tac) {
   TAC *variableDec;
 
   fprintf(fout, "## DATA SECTION\n"
-	              "\t.section	.data\n\n");
+	              "\t.section	.data\n\n"
+                  "_tEmPinD3x_: .long 0\n");
 
   for(i = 0; i < HASH_SIZE; ++i) {
     for(node = Table[i]; node; node = node->next) {
@@ -369,7 +370,6 @@ void generateAsm(TAC* first) {
             case TAC_PRINT: 
                 HASH *hash = hashFind(tac->res->text);
                 if (hash->type == SYMBOL_LIT_STRING) {
-                    printf("\n%s - %d\n", tac->res->text, numString);
                     fprintf(fout, "##TAC_PRINT\n"
 	                "\tleaq	_myString%d(%%rip), %%rax\n"
                     "\tmovq	%%rax, %%rdi\n"
@@ -473,9 +473,10 @@ void generateAsm(TAC* first) {
                                              "\tcall %s\n"
                                              "\tmovl %%eax, _%s(%%rip)\n", tac->op1->text, tac->res->text);
                 break;
-            case TAC_MOVE_ARRAY: fprintf(fout, "##TAC_MOVE_ARRAY\n"
-                                               "\tmovl _%s(%%rip), %%eax\n"
-                                               "\tmovl %%eax, %d+_%s(%%rip)\n", tac->op2->text, atoi(tac->op1->text)*4, tac->res->text); 
+            case TAC_MOVE_ARRAY:  
+                fprintf(fout, "##TAC_MOVE_ARRAY\n"
+                              "\tmovl _%s(%%rip), %%eax\n"
+                              "\tmovl %%eax, %d+_%s(%%rip)\n", tac->op2->text, atoi(tac->op1->text)*4, tac->res->text); 
                 break;
             case TAC_ARRAY: fprintf(fout, "##TAC_ARRAY\n"
                                                "\tmovl %d+_%s(%%rip), %%eax\n"

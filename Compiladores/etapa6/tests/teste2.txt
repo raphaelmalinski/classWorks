@@ -1,0 +1,28 @@
+inte a = 0;
+inte b = 0;
+inte c = 0;
+
+inte soma(inte x, inte y) {
+    retorne x + y;
+}
+
+inte subtrai(inte x, inte y) {
+    retorne x - y;
+}
+
+inte main() {
+    escreva "Digite o primeiro dígito:";
+    a = entrada;
+    escreva "Digite o segundo digito:";
+    b = entrada;
+    
+    entaum
+    {
+        c = subtrai(a, b);
+        escreva "Subtração é igual a " c
+    } 
+    senaum {
+        c = soma(a b);
+        escreva "Soma é igual a " c
+    } se (a > b)
+}

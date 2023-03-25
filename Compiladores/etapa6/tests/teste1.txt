@@ -1,18 +1,22 @@
-
 inte a = 0;
 inte b = 0;
 inte c = 0;
+cara sair = 0;
 
 inte multiplica(inte x, inte y) {
     retorne x * y;
 }
 
 inte main() {
+    {
     escreva "Digite o primeiro fator:";
     a = entrada;
     escreva "Digite o segundo fator:";
     b = entrada;
 
     c = multiplica(a b);
-    escreva "Produto é igual a " c
+    escreva "Produto é igual a " c;
+    escreva "Deseja sair? (S-1/N-0) ";
+    sair = entrada;
+    } enquanto (~sair);
 }
